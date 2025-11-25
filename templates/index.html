@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalcTool - Visual e Detalhado</title>
+    <title>CalcTool Pro - Calculadora Visual</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -16,6 +16,7 @@
             padding: 2rem 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
         .main-card {
             background: white;
             border-radius: 20px;
@@ -23,16 +24,67 @@
             overflow: hidden;
             margin-bottom: 50px;
         }
+        
         .header-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
+        
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .header-section p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            font-size: 1.1rem;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #e0e0e0;
+            padding: 0 1rem;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: #667eea;
+        }
+        
         .nav-tabs .nav-link.active {
             color: #667eea;
             border-bottom: 3px solid #667eea;
+            background: transparent;
         }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
         .resultado-card {
             background: #f8f9fa;
             border-radius: 15px;
@@ -40,38 +92,43 @@
             margin-top: 2rem;
             border: 1px solid #e9ecef;
         }
+        
         .resultado-math {
             background: white;
-            padding: 2rem; /* Mais espaço interno */
+            padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
             text-align: center;
             font-size: 1.2rem;
-            line-height: 2.0; /* Aumenta espaçamento entre linhas de texto normal */
+            line-height: 2.2;
         }
         
-        /* ESTILO NOVO PARA O PASSO A PASSO */
         .step-by-step {
             margin-top: 2rem;
         }
+        
         .step-by-step h5 {
             color: #667eea;
             font-weight: 700;
             margin-bottom: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
+        
         .step-item {
             background: white;
             padding: 1.5rem;
-            margin-bottom: 1.5rem; /* Separar bem os passos */
+            margin-bottom: 1.5rem;
             border-left: 5px solid #667eea;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: transform 0.2s;
+            font-size: 1.05rem;
+            line-height: 2.0;
         }
+        
         .step-item:hover {
             transform: translateX(5px);
         }
@@ -83,21 +140,68 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             margin-top: 2rem;
         }
+        
+        .controles-integral {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
         .area-info {
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 15px;
         }
+        
         .area-box {
             padding: 1.5rem;
             border-radius: 12px;
             text-align: center;
+            transition: transform 0.2s;
         }
+        
+        .area-box:hover {
+            transform: translateY(-3px);
+        }
+        
+        .area-box h6 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
         .area-box .valor {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 800;
             margin: 0.5rem 0;
+        }
+        
+        .area-box small {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .badge-dinamico {
+            background: #667eea;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .config-aba {
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -105,63 +209,123 @@
 
 <div class="container">
     <div class="main-card">
+        <!-- Header -->
         <div class="header-section">
             <h1>📊 CalcTool Pro</h1>
-            <p>Limites, Derivadas, Integrais e Gráficos Interativos</p>
+            <p>Visualização Interativa de Cálculo Diferencial e Integral</p>
         </div>
 
-        <ul class="nav nav-tabs px-3" role="tablist">
-            <li class="nav-item"><button class="nav-link {% if aba_ativa == 'limite' %}active{% endif %}" onclick="mudarAba('limite')">Limites</button></li>
-            <li class="nav-item"><button class="nav-link {% if aba_ativa == 'derivada' %}active{% endif %}" onclick="mudarAba('derivada')">Derivada</button></li>
-            <li class="nav-item"><button class="nav-link {% if aba_ativa == 'pontos_criticos' %}active{% endif %}" onclick="mudarAba('pontos_criticos')">Pontos Críticos</button></li>
-            <li class="nav-item"><button class="nav-link {% if aba_ativa == 'integral' %}active{% endif %}" onclick="mudarAba('integral')">Integral</button></li>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link {% if aba_ativa == 'limite' %}active{% endif %}" 
+                        onclick="mudarAba('limite')">
+                    Limites
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link {% if aba_ativa == 'derivada' %}active{% endif %}" 
+                        onclick="mudarAba('derivada')">
+                    Derivada
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link {% if aba_ativa == 'pontos_criticos' %}active{% endif %}" 
+                        onclick="mudarAba('pontos_criticos')">
+                    Pontos Críticos
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link {% if aba_ativa == 'integral' %}active{% endif %}" 
+                        onclick="mudarAba('integral')">
+                    Integral
+                </button>
+            </li>
         </ul>
 
+        <!-- Form Section -->
         <div class="p-4">
             <form method="POST" action="/">
                 <input type="hidden" name="aba_ativa" id="input_aba_ativa" value="{{ aba_ativa }}">
                 
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Função f(x):</label>
-                    <input type="text" class="form-control form-control-lg" name="funcao" value="{{ funcao }}" placeholder="Ex: x**3 - 2*x" required>
+                    <label class="form-label fw-bold">📐 Função f(x):</label>
+                    <input type="text" 
+                           class="form-control form-control-lg" 
+                           name="funcao" 
+                           value="{{ funcao }}" 
+                           placeholder="Ex: x**3 - 2*x, sin(x), 1/(x-2)" 
+                           required>
+                    <small class="text-muted">
+                        Use: ** (potência), sqrt() (raiz), sin/cos/tan, exp(), log()
+                    </small>
                 </div>
 
+                <!-- LIMITE -->
                 <div class="config-aba" id="div-limite" {% if aba_ativa != 'limite' %}style="display:none"{% endif %}>
-                    <label class="form-label">Ponto (x → p):</label>
-                    <input type="number" step="any" class="form-control" name="ponto_limite" value="{{ params.ponto }}">
+                    <label class="form-label">Ponto de tendência (x → p):</label>
+                    <input type="number" 
+                           step="any" 
+                           class="form-control" 
+                           name="ponto_limite" 
+                           value="{{ params.ponto }}">
                 </div>
 
+                <!-- INTEGRAL -->
                 <div class="config-aba" id="div-integral" {% if aba_ativa != 'integral' %}style="display:none"{% endif %}>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Início (a):</label>
-                            <input type="number" step="any" class="form-control" name="int_a" value="{{ params.int_a }}">
+                            <label class="form-label">Início do intervalo (a):</label>
+                            <input type="number" 
+                                   step="any" 
+                                   class="form-control" 
+                                   name="int_a" 
+                                   value="{{ params.int_a }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Fim (b):</label>
-                            <input type="number" step="any" class="form-control" name="int_b" value="{{ params.int_b }}">
+                            <label class="form-label">Fim do intervalo (b):</label>
+                            <input type="number" 
+                                   step="any" 
+                                   class="form-control" 
+                                   name="int_b" 
+                                   value="{{ params.int_b }}">
                         </div>
                     </div>
                     <div class="mt-3">
-                        <label class="form-label">N Retângulos Inicial: {{ params.int_n }}</label>
-                        <input type="range" class="form-range" min="1" max="100" name="int_n" value="{{ params.int_n }}">
+                        <label class="form-label">
+                            Retângulos iniciais: <span class="badge-dinamico">{{ params.int_n }}</span>
+                        </label>
+                        <input type="range" 
+                               class="form-range" 
+                               min="1" 
+                               max="100" 
+                               name="int_n" 
+                               value="{{ params.int_n }}">
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">Calcular e Detalhar</button>
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+                    🚀 Calcular e Visualizar
+                </button>
             </form>
         </div>
 
+        <!-- Resultados -->
         {% if resultado %}
         <div class="resultado-card mx-4 mb-4">
-            <h4 class="text-center mb-4" style="color: #667eea;">Resultado Final</h4>
+            <h4 class="text-center mb-4" style="color: #667eea; font-weight: 700;">
+                📈 Resultado Final
+            </h4>
+            
             <div class="resultado-math">
                 $$ {{ resultado | safe }} $$
             </div>
 
+            <!-- Step by Step -->
             {% if steps %}
             <div class="step-by-step">
-                <h5>📝 Passo a Passo da Solução</h5>
+                <h5>📝 Resolução Passo a Passo</h5>
                 {% for step in steps %}
                 <div class="step-item">
                     $$ {{ step | safe }} $$
@@ -172,24 +336,41 @@
             
             {% if dados_grafico %}
             <hr class="my-5">
-            <h4 class="text-center mb-3">Visualização Gráfica</h4>
+            <h4 class="text-center mb-4" style="color: #667eea;">
+                📊 Visualização Gráfica Interativa
+            </h4>
             
+            <!-- Controles Dinâmicos (apenas Integral) -->
             <div id="controles-dinamicos" style="display: none;">
-                <div class="area-info">
-                    <div class="area-box" style="background: #f8f9fa; border: 1px solid #dee2e6;">
-                        <h6 style="color: #666;">Integral Definida (Líquida)</h6>
-                        <div class="valor" id="integral_liquida_display" style="color: #333;">-</div>
-                        <small class="text-muted">Soma Riemann: <span id="soma_liquida_display">-</span></small>
+                <div class="controles-integral">
+                    <h6 class="text-center mb-3" style="color: #667eea; font-weight: 700;">
+                        🎚️ Controle Dinâmico de Aproximação
+                    </h6>
+                    
+                    <div class="area-info">
+                        <div class="area-box" style="background: linear-gradient(135deg, #e8f4fc 0%, #c3e0f7 100%); border: 2px solid #3498db;">
+                            <h6 style="color: #2980b9;">Integral Líquida</h6>
+                            <div class="valor" id="integral_liquida_display" style="color: #2980b9;">-</div>
+                            <small class="text-muted">Soma Riemann: <strong id="soma_liquida_display">-</strong></small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Considera sinal (+ e -)</small>
+                        </div>
+                        <div class="area-box" style="background: linear-gradient(135deg, #fef5e7 0%, #fdeaa8 100%); border: 2px solid #f39c12;">
+                            <h6 style="color: #e67e22;">Área Geométrica</h6>
+                            <div class="valor" id="area_geometrica_display" style="color: #e67e22;">-</div>
+                            <small class="text-muted">Soma Riemann: <strong id="soma_absoluta_display">-</strong></small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Sempre positiva (|f(x)|)</small>
+                        </div>
                     </div>
-                    <div class="area-box" style="background: #e8f4fc; border: 1px solid #b6e1fc;">
-                        <h6 style="color: #2c3e50;">Área Geométrica (Total)</h6>
-                        <div class="valor" id="area_geometrica_display" style="color: #2980b9;">-</div>
-                        <small class="text-muted">Soma Riemann: <span id="soma_absoluta_display">-</span></small>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label>Ajuste Dinâmico de Retângulos: <span id="val_n_dinamico"></span></label>
-                    <input type="range" class="form-range" min="1" max="100" id="slider_dinamico">
+                    
+                    <label class="form-label text-center w-100">
+                        Número de Retângulos: <span class="badge-dinamico" id="val_n_dinamico">10</span>
+                    </label>
+                    <input type="range" 
+                           class="form-range" 
+                           min="1" 
+                           max="100" 
+                           id="slider_dinamico"
+                           value="10">
                 </div>
             </div>
             
@@ -201,149 +382,333 @@
 </div>
 
 <script>
+    // ============================================
+    // CONTROLE DE ABAS
+    // ============================================
     function mudarAba(aba) {
         document.getElementById('input_aba_ativa').value = aba;
         document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
         event.target.classList.add('active');
         document.querySelectorAll('.config-aba').forEach(el => el.style.display = 'none');
-        if (aba === 'limite') document.getElementById('div-limite').style.display = 'block';
-        if (aba === 'integral') document.getElementById('div-integral').style.display = 'block';
+        
+        if (aba === 'limite') {
+            document.getElementById('div-limite').style.display = 'block';
+        } else if (aba === 'integral') {
+            document.getElementById('div-integral').style.display = 'block';
+        }
     }
 
+    // ============================================
+    // RENDERIZAÇÃO DO GRÁFICO INTERATIVO
+    // ============================================
     {% if dados_grafico %}
     (function() {
         const dadosOriginais = {{ dados_grafico | safe }};
         const chartDom = document.getElementById('main-chart');
         const myChart = echarts.init(chartDom);
-        let option = {};
-
+        
+        // Configurações comuns para todos os gráficos
         const commonConfig = {
             toolbox: {
-                feature: { dataZoom: { yAxisIndex: 'none' }, restore: {}, saveAsImage: {} },
-                right: 20
+                feature: {
+                    dataZoom: { yAxisIndex: 'none' },
+                    restore: {},
+                    saveAsImage: { name: 'calctool_grafico' }
+                },
+                right: 20,
+                top: 10
             },
-            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-            grid: { left: '8%', right: '8%', bottom: '15%', top: '15%' },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'cross' }
+            },
+            grid: {
+                left: '8%',
+                right: '8%',
+                bottom: '15%',
+                top: '15%',
+                containLabel: true
+            },
             dataZoom: [
                 { type: 'inside', xAxisIndex: 0, filterMode: 'filter' },
-                { type: 'slider', xAxisIndex: 0, filterMode: 'filter' },
+                { type: 'slider', xAxisIndex: 0, filterMode: 'filter', bottom: '5%' },
                 { type: 'inside', yAxisIndex: 0, filterMode: 'empty' }
             ],
-            xAxis: { type: 'value', minInterval: 1, axisLabel: { formatter: '{value}' }, minorTick: { show: true } },
-            yAxis: { type: 'value', minInterval: 1, axisLabel: { formatter: '{value}' }, minorTick: { show: true } }
+            xAxis: {
+                type: 'value',
+                name: 'x',
+                nameLocation: 'middle',
+                nameGap: 30,
+                minInterval: 1,
+                axisLabel: { formatter: '{value}' },
+                minorTick: { show: true },
+                splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'f(x)',
+                nameLocation: 'middle',
+                nameGap: 50,
+                minInterval: 1,
+                axisLabel: { formatter: '{value}' },
+                minorTick: { show: true },
+                splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
+            }
         };
 
+        let option = {};
+
+        // =======================================
+        // 1. LIMITE - Bolinha Fechada/Aberta
+        // =======================================
         if (dadosOriginais.tipo === 'limite') {
             const isAberta = dadosOriginais.ponto_destaque.estilo === 'aberta';
+            
             option = {
                 ...commonConfig,
-                title: { text: 'Análise de Limite', left: 'center' },
-                legend: { data: ['f(x)', isAberta ? 'Descontinuidade' : 'Contínua'], top: 35 },
+                title: {
+                    text: 'Análise de Limite e Continuidade',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold' }
+                },
+                legend: {
+                    data: ['f(x)', isAberta ? 'Descontinuidade' : 'Função Contínua'],
+                    top: 40
+                },
                 series: [{
-                    name: 'f(x)', type: 'line', data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                    smooth: true, lineStyle: { width: 3, color: '#667eea' }, showSymbol: false
+                    name: 'f(x)',
+                    type: 'line',
+                    data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#667eea' },
+                    showSymbol: false,
+                    connectNulls: false
                 }, {
-                    name: isAberta ? 'Descontinuidade' : 'Contínua', type: 'scatter',
+                    name: isAberta ? 'Descontinuidade' : 'Função Contínua',
+                    type: 'scatter',
                     data: [[dadosOriginais.ponto_destaque.x, dadosOriginais.ponto_destaque.y]],
-                    symbolSize: 20, itemStyle: { color: isAberta ? 'white' : '#e74c3c', borderColor: '#e74c3c', borderWidth: 3 }, z: 10
+                    symbolSize: 22,
+                    itemStyle: {
+                        color: isAberta ? 'white' : '#e74c3c',
+                        borderColor: '#e74c3c',
+                        borderWidth: 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: `(${dadosOriginais.ponto_destaque.x.toFixed(1)}, ${dadosOriginais.ponto_destaque.y.toFixed(2)})`,
+                        position: 'top',
+                        color: '#333',
+                        fontWeight: 'bold',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        padding: [8, 12],
+                        borderRadius: 6,
+                        borderColor: '#e74c3c',
+                        borderWidth: 1
+                    },
+                    z: 10
                 }]
             };
-        } else if (dadosOriginais.tipo === 'derivada') {
+        }
+
+        // =======================================
+        // 2. DERIVADA
+        // =======================================
+        else if (dadosOriginais.tipo === 'derivada') {
             option = {
                 ...commonConfig,
-                title: { text: "Gráfico da Derivada f'(x)", left: 'center' },
-                legend: { data: ["f'(x)"], top: 35 },
+                title: {
+                    text: "Gráfico da Derivada f'(x)",
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e74c3c' }
+                },
+                legend: { data: ["f'(x)"], top: 40 },
+                yAxis: { ...commonConfig.yAxis, name: "f'(x)" },
                 series: [{
-                    name: "f'(x)", type: 'line', data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                    smooth: true, lineStyle: { width: 3, color: '#e74c3c' }, showSymbol: false
+                    name: "f'(x)",
+                    type: 'line',
+                    data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#e74c3c' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(231, 76, 60, 0.3)' },
+                            { offset: 1, color: 'rgba(231, 76, 60, 0.05)' }
+                        ])
+                    },
+                    showSymbol: false,
+                    connectNulls: false
                 }]
             };
-        } else if (dadosOriginais.tipo === 'pontos_criticos') {
+        }
+
+        // =======================================
+        // 3. PONTOS CRÍTICOS
+        // =======================================
+        else if (dadosOriginais.tipo === 'pontos_criticos') {
             option = {
                 ...commonConfig,
-                title: { text: 'Pontos Críticos', left: 'center' },
-                legend: { data: ['f(x)', 'Pontos Críticos'], top: 35 },
+                title: {
+                    text: 'Pontos Críticos (Máximos e Mínimos Locais)',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold' }
+                },
+                legend: { data: ['f(x)', 'Pontos Críticos'], top: 40 },
                 series: [{
-                    name: 'f(x)', type: 'line', data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                    smooth: true, lineStyle: { width: 3, color: '#667eea' }, showSymbol: false
+                    name: 'f(x)',
+                    type: 'line',
+                    data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#667eea' },
+                    showSymbol: false,
+                    connectNulls: false
                 }, {
-                    name: 'Pontos Críticos', type: 'scatter',
+                    name: 'Pontos Críticos',
+                    type: 'scatter',
                     data: dadosOriginais.pontos.map(p => [p.x, p.y]),
-                    symbolSize: 20, itemStyle: { color: '#f39c12', borderColor: '#e67e22', borderWidth: 2 },
-                    label: { show: true, formatter: (p) => dadosOriginais.pontos[p.dataIndex].label, position: 'top' }
+                    symbolSize: 24,
+                    itemStyle: {
+                        color: '#f39c12',
+                        borderColor: '#e67e22',
+                        borderWidth: 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: (params) => dadosOriginais.pontos[params.dataIndex].label,
+                        position: 'top',
+                        color: '#333',
+                        fontWeight: 'bold',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        padding: [8, 12],
+                        borderRadius: 6,
+                        borderColor: '#f39c12',
+                        borderWidth: 1
+                    }
                 }]
             };
-        } else if (dadosOriginais.tipo === 'integral') {
+        }
+
+        // =======================================
+        // 4. INTEGRAL - Soma de Riemann Dinâmica
+        // =======================================
+        else if (dadosOriginais.tipo === 'integral') {
             document.getElementById('controles-dinamicos').style.display = 'block';
+            
             function calcularRetangulos(n) {
                 const a = dadosOriginais.intervalo[0];
                 const b = dadosOriginais.intervalo[1];
                 const delta_x = (b - a) / n;
+                
                 const retangulos = [];
-                let area_aprox_liquida = 0;
-                let area_aprox_absoluta = 0;
+                let soma_liquida = 0;
+                let soma_absoluta = 0;
+                
                 for (let i = 0; i < n; i++) {
                     const x_esq = a + i * delta_x;
                     const idx = dadosOriginais.eixo_x.findIndex(x => x >= x_esq);
                     const altura = dadosOriginais.eixo_y[idx] || 0;
+                    
                     if (altura !== null) {
                         retangulos.push({ x: x_esq, largura: delta_x, altura: altura });
-                        area_aprox_liquida += altura * delta_x;
-                        area_aprox_absoluta += Math.abs(altura * delta_x);
+                        soma_liquida += altura * delta_x;
+                        soma_absoluta += Math.abs(altura * delta_x);
                     }
                 }
-                return { retangulos, area_aprox_liquida, area_aprox_absoluta };
+                
+                return { retangulos, soma_liquida, soma_absoluta };
             }
+            
             function renderizarGrafico(n) {
-                const { retangulos, area_aprox_liquida, area_aprox_absoluta } = calcularRetangulos(n);
-                const int_liquida = dadosOriginais.integral_liquida;
-                const area_geom = dadosOriginais.area_geometrica;
-                document.getElementById('integral_liquida_display').innerText = int_liquida.toFixed(4);
-                document.getElementById('soma_liquida_display').innerText = area_aprox_liquida.toFixed(4);
-                document.getElementById('area_geometrica_display').innerText = area_geom.toFixed(4);
-                document.getElementById('soma_absoluta_display').innerText = area_aprox_absoluta.toFixed(4);
+                const { retangulos, soma_liquida, soma_absoluta } = calcularRetangulos(n);
+                
+                // Atualiza displays
+                document.getElementById('integral_liquida_display').innerText = dadosOriginais.integral_liquida.toFixed(6);
+                document.getElementById('soma_liquida_display').innerText = soma_liquida.toFixed(6);
+                document.getElementById('area_geometrica_display').innerText = dadosOriginais.area_geometrica.toFixed(6);
+                document.getElementById('soma_absoluta_display').innerText = soma_absoluta.toFixed(6);
                 
                 option = {
                     ...commonConfig,
-                    title: { text: `Soma de Riemann (n=${n})`, left: 'center' },
-                    legend: { data: ['f(x)', 'Retângulos'], top: 35 },
+                    title: {
+                        text: `Soma de Riemann (n = ${n} retângulos)`,
+                        left: 'center',
+                        textStyle: { fontSize: 18, fontWeight: 'bold' }
+                    },
+                    legend: {
+                        data: ['f(x)', 'Retângulos (+)', 'Retângulos (-)'],
+                        top: 40
+                    },
                     series: [{
-                        name: 'f(x)', type: 'line', data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                        smooth: true, lineStyle: { width: 3, color: '#667eea' }, showSymbol: false, z: 10
+                        name: 'f(x)',
+                        type: 'line',
+                        data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
+                        smooth: true,
+                        lineStyle: { width: 3, color: '#667eea' },
+                        showSymbol: false,
+                        z: 10,
+                        connectNulls: false
                     }, {
-                        name: 'Retângulos', type: 'custom',
+                        name: 'Retângulos',
+                        type: 'custom',
                         renderItem: function(params, api) {
                             const dataIndex = params.dataIndex;
                             const ret = retangulos[dataIndex];
+                            
                             const x_inicio = api.coord([ret.x, 0])[0];
                             const x_fim = api.coord([ret.x + ret.largura, 0])[0];
                             const y_zero = api.coord([0, 0])[1];
                             const y_val = api.coord([0, ret.altura])[1];
+                            
+                            // Cor baseada no sinal (positivo = azul, negativo = vermelho)
+                            const isPositivo = ret.altura >= 0;
+                            
                             return {
                                 type: 'rect',
-                                shape: { x: x_inicio, y: Math.min(y_zero, y_val), width: x_fim - x_inicio, height: Math.abs(y_zero - y_val) },
-                                style: { fill: ret.altura >= 0 ? 'rgba(52, 152, 219, 0.4)' : 'rgba(231, 76, 60, 0.4)', stroke: ret.altura >= 0 ? 'rgba(52, 152, 219, 0.8)' : 'rgba(231, 76, 60, 0.8)', lineWidth: 1 }
+                                shape: {
+                                    x: x_inicio,
+                                    y: Math.min(y_zero, y_val),
+                                    width: x_fim - x_inicio,
+                                    height: Math.abs(y_zero - y_val)
+                                },
+                                style: {
+                                    fill: isPositivo ? 'rgba(52, 152, 219, 0.5)' : 'rgba(231, 76, 60, 0.5)',
+                                    stroke: isPositivo ? 'rgba(52, 152, 219, 0.9)' : 'rgba(231, 76, 60, 0.9)',
+                                    lineWidth: 1
+                                }
                             };
-                        }, data: retangulos, z: 5
+                        },
+                        data: retangulos,
+                        z: 5
                     }]
                 };
+                
                 myChart.setOption(option);
             }
+            
+            // Configuração inicial
             const nInicial = dadosOriginais.retangulos.length;
             const slider = document.getElementById('slider_dinamico');
             slider.value = nInicial;
             document.getElementById('val_n_dinamico').innerText = nInicial;
             renderizarGrafico(nInicial);
+            
+            // Evento do slider dinâmico
             slider.addEventListener('input', function(e) {
                 const n = parseInt(e.target.value);
                 document.getElementById('val_n_dinamico').innerText = n;
                 renderizarGrafico(n);
             });
         }
-        if (dadosOriginais.tipo !== 'integral') myChart.setOption(option);
+
+        // Renderiza gráfico inicial (exceto integral)
+        if (dadosOriginais.tipo !== 'integral') {
+            myChart.setOption(option);
+        }
+        
+        // Responsividade
         window.addEventListener('resize', () => myChart.resize());
     })();
     {% endif %}
 </script>
+
 </body>
 </html>
