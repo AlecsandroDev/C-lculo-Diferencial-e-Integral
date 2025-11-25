@@ -10,11 +10,6 @@ Uma aplicação web educacional desenvolvida para resolver e visualizar conceito
 ## 📸 Screenshots
 
 | Soma de Riemann | Área Líquida vs Geométrica |
-|:---:|:---:|
-| ![Soma de Riemann](assets/image_1c9f13.png) | ![Integral Negativa](assets/image_1c9afd.png) |
-
-*(Nota: Substitua os caminhos acima pelas imagens do seu projeto)*
-
 ## 🚀 Funcionalidades Principais
 
 O CalcTool Pro é dividido em 4 módulos principais, cada um com visualizações específicas:
