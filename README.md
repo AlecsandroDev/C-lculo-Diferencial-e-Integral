@@ -7,9 +7,6 @@
 
 Uma aplicação web educacional desenvolvida para resolver e visualizar conceitos de **Cálculo Diferencial e Integral** de forma interativa. O projeto foca na precisão matemática visual (ex: descontinuidades) e na explicação passo a passo.
 
-## 📸 Screenshots
-
-| Soma de Riemann | Área Líquida vs Geométrica |
 ## 🚀 Funcionalidades Principais
 
 O CalcTool Pro é dividido em 4 módulos principais, cada um com visualizações específicas:
