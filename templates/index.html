@@ -300,7 +300,6 @@
 
             const dadosOriginais = {{ dados_grafico | tojson | safe
         }};
-        console.log("DADOS:", dadosOriginais);
 
         const chartDom = document.getElementById('main-chart');
         const myChart = echarts.init(chartDom);
@@ -431,7 +430,7 @@
                 const y0 = interpolaY(xTangente);
                 const m = estimaInclinação(xTangente);
 
-                const rx = [xTangente - 5, xTangente + 5];
+                const rx = [xTangente - 1, xTangente + 1];
                 const ry = rx.map(x => m * (x - xTangente) + y0);
 
                 option = {
@@ -444,10 +443,10 @@
                             type: 'line',
                             data: xs.map((x, i) => [x, ys[i]]),
                             smooth: true,
-                            lineStyle: { width: 3, color: '#667eea' },
+                            lineStyle: { width: 2, color: '#667eea' },
                             showSymbol: false,
                             connectNulls: false,
-                            z: 5
+                            z: 4
                         },
                         {
                             name: `Tangente (m = ${m.toFixed(4)})`,
