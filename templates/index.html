@@ -447,63 +447,61 @@
         // =======================================
         // LIMITE - REFEITO
         // =======================================
-        if (dadosOriginais.tipo === 'limite') {
-            // protege caso y seja null/undefined
-            const yHighlight = (typeof dadosOriginais.ponto_destaque.y === 'number') ? dadosOriginais.ponto_destaque.y : null;
-            const isAberta = dadosOriginais.ponto_destaque.estilo === 'aberta';
+        if (dadosOriginais.tipo === "limite") {
+
+            function safeFormat(x, y) {
+                if (typeof y === "number" && isFinite(y)) {
+                    return `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+                }
+                return `(${x.toFixed(2)}, n/a)`;
+            }
+
+            const yReal = (typeof dadosOriginais.ponto_destaque.y === "number" && isFinite(dadosOriginais.ponto_destaque.y))
+                ? dadosOriginais.ponto_destaque.y
+                : null;
+
+            const isAberta = dadosOriginais.ponto_destaque.estilo === "aberta";
 
             option = {
                 ...commonConfig,
                 title: {
-                    text: 'Análise de Limite e Continuidade',
-                    left: 'center',
-                    textStyle: { fontSize: 18, fontWeight: 'bold' }
+                    text: "Análise de Limite e Continuidade",
+                    left: "center",
+                    textStyle: { fontSize: 18, fontWeight: "bold" }
                 },
                 legend: {
-                    data: ['f(x)', isAberta ? 'Descontinuidade (○)' : 'Contínua (●)'],
+                    data: ["f(x)", isAberta ? "Bolinha Aberta (○)" : "Bolinha Fechada (●)"],
                     top: 40
                 },
-                series: [{
-                    name: 'f(x)',
-                    type: 'line',
-                    data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                    smooth: true,
-                    lineStyle: { width: 3, color: '#667eea' },
-                    showSymbol: false,
-                    connectNulls: false
-                }, {
-                    name: isAberta ? 'Descontinuidade (○)' : 'Contínua (●)',
-                    type: 'scatter',
-                    data: [[dadosOriginais.ponto_destaque.x, yHighlight]],
-                    symbolSize: 24,
-                    itemStyle: {
-                        color: isAberta ? 'white' : '#e74c3c',
-                        borderColor: '#e74c3c',
-                        borderWidth: 4
+                series: [
+                    {
+                        name: "f(x)",
+                        type: "line",
+                        data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
+                        smooth: true,
+                        lineStyle: { width: 3, color: "#667eea" },
+                        showSymbol: false
                     },
-                    label: {
-                        show: true,
-                        // usa função para evitar errors caso y seja null
-                        formatter: function (params) {
-                            const xVal = params.value[0];
-                            const yVal = params.value[1];
-                            if (typeof yVal === 'number') {
-                                return `(${xVal.toFixed(2)}, ${yVal.toFixed(2)})`;
-                            } else {
-                                return `(${xVal.toFixed(2)}, n/a)`;
-                            }
+                    {
+                        name: isAberta ? "Bolinha Aberta (○)" : "Bolinha Fechada (●)",
+                        type: "scatter",
+                        data: [[dadosOriginais.ponto_destaque.x, yReal]],
+                        symbolSize: 24,
+                        itemStyle: {
+                            color: isAberta ? "white" : "#e74c3c",
+                            borderColor: "#e74c3c",
+                            borderWidth: 3
                         },
-                        position: 'top',
-                        color: '#333',
-                        fontWeight: 'bold',
-                        backgroundColor: 'rgba(255,255,255,0.95)',
-                        padding: [8, 12],
-                        borderRadius: 6,
-                        borderColor: '#e74c3c',
-                        borderWidth: 1
-                    },
-                    z: 10
-                }]
+                        label: {
+                            show: true,
+                            formatter: p => safeFormat(p.value[0], p.value[1]),
+                            position: "top",
+                            backgroundColor: "white",
+                            padding: [6, 10],
+                            borderRadius: 6
+                        }
+                    }
+                ]
             };
 
             myChart.setOption(option);
@@ -512,160 +510,125 @@
         // =======================================
         // DERIVADA - REFEITO COM TANGENTE DINÂMICA
         // =======================================
-        else if (dadosOriginais.tipo === 'derivada') {
-            // Mostrar controles dinâmicos (reutiliza a área de controles)
-            document.getElementById('controles-dinamicos').style.display = 'block';
-            document.querySelector('.controles-integral h6').innerText = '🎚️ Controle da Reta Tangente';
-            document.querySelector('.area-info').style.display = 'none'; // Esconder boxes de área
+        else if (dadosOriginais.tipo === "derivada") {
 
-            // arrays numéricos do backend
-            const xs = dadosOriginais.eixo_x.map(v => parseFloat(v));
-            const ysRaw = dadosOriginais.eixo_y; // pode ter nulls
-            // converte para números ou NaN mantendo o mesmo índice
-            const ys = ysRaw.map(v => (typeof v === 'number' ? v : NaN));
+            const slider = document.getElementById("slider_ponto_tangente_form") ||
+                document.getElementById("slider_dinamico");
 
-            // função auxiliar: interpola y no ponto x0 (linear entre vizinhos)
-            function interpolaY(x0) {
-                if (xs.length === 0) return NaN;
-                // se x0 está fora do range, faz extrapolação linear pelos extremos
-                if (x0 <= xs[0]) {
-                    return ys[0];
-                }
-                if (x0 >= xs[xs.length - 1]) {
-                    return ys[ys.length - 1];
-                }
-                // encontra intervalo [xi, xi+1] tal que xi <= x0 <= xi+1
+            const badge = document.getElementById("val_ponto_tangente_form") ||
+                document.getElementById("val_dinamico");
+
+            // Arrays numéricos
+            const xs = dadosOriginais.eixo_x.map(Number);
+            const ys = dadosOriginais.eixo_y.map(v => (typeof v === "number" ? v : NaN));
+
+            // ——— Função de interpolação ———
+            function interpola(x0) {
                 for (let i = 0; i < xs.length - 1; i++) {
-                    const x1 = xs[i], x2 = xs[i + 1];
-                    const y1 = ys[i], y2 = ys[i + 1];
-                    if (x0 >= x1 && x0 <= x2) {
-                        if (!isFinite(y1) || !isFinite(y2)) return NaN;
-                        // evita divisão por zero
-                        const t = (x2 - x1) === 0 ? 0 : (x0 - x1) / (x2 - x1);
-                        return y1 + t * (y2 - y1);
+                    if (x0 >= xs[i] && x0 <= xs[i + 1]) {
+                        const t = (x0 - xs[i]) / (xs[i + 1] - xs[i]);
+                        return ys[i] + t * (ys[i + 1] - ys[i]);
                     }
                 }
                 return NaN;
             }
 
-            // função auxiliar: estima inclinação numérica no ponto x0 (diferença central)
-            function estimaInclinação(x0) {
-                // encontra índice mais próximo
+            // ——— Derivada numérica (diferença central) ———
+            function derivada(x0) {
                 let i = xs.findIndex(x => x >= x0);
-                if (i === -1) i = xs.length - 1;
+                i = Math.max(1, Math.min(i, xs.length - 2));
 
-                // tenta central difference (i-1, i+1)
-                const i_minus = Math.max(0, i - 1);
-                const i_plus = Math.min(xs.length - 1, i + 1);
+                const xA = xs[i - 1], xB = xs[i + 1];
+                const yA = ys[i - 1], yB = ys[i + 1];
 
-                // se não houver vizinhos suficientes, usa forward/backward
-                const xA = xs[i_minus], xB = xs[i_plus];
-                const yA = ys[i_minus], yB = ys[i_plus];
-
-                if (!isFinite(yA) || !isFinite(yB) || (xB - xA) === 0) {
-                    return 0; // fallback
-                }
+                if (!isFinite(yA) || !isFinite(yB)) return 0;
 
                 return (yB - yA) / (xB - xA);
             }
 
-            function calcularRetaTangente(xTangente) {
-                const y0 = interpolaY(xTangente);
-                const m = estimaInclinação(xTangente);
+            // ——— Renderiza o gráfico ———
+            function render(x0) {
+                const y0 = interpola(x0);
+                const m = derivada(x0);
 
-                const reta_x = [xTangente - 5, xTangente + 5];
-                const reta_y = reta_x.map(x => m * (x - xTangente) + y0);
-
-                return { ponto: [xTangente, y0], reta_x, reta_y, inclinacao: m };
-            }
-
-            function renderizarGrafico(xTangente) {
-                const { ponto, reta_x, reta_y, inclinacao } = calcularRetaTangente(xTangente);
+                const rx = [x0 - 5, x0 + 5];
+                const ry = rx.map(x => m * (x - x0) + y0);
 
                 option = {
                     ...commonConfig,
                     title: {
-                        text: `Derivada: Reta Tangente em x = ${xTangente.toFixed(2)}`,
-                        left: 'center',
-                        textStyle: { fontSize: 18, fontWeight: 'bold' }
+                        text: `Tangente em x = ${x0.toFixed(2)}`,
+                        left: "center",
+                        textStyle: { fontSize: 18, fontWeight: "bold" }
                     },
                     legend: {
-                        data: ['f(x)', `Tangente (m = ${inclinacao.toFixed(4)})`, 'Ponto de Tangência'],
+                        data: ["f(x)", `Tangente (m = ${m.toFixed(4)})`, "Ponto"],
                         top: 40
                     },
-                    series: [{
-                        name: 'f(x)',
-                        type: 'line',
-                        data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                        smooth: true,
-                        lineStyle: { width: 3, color: '#667eea' },
-                        showSymbol: false,
-                        connectNulls: false,
-                        z: 5
-                    }, {
-                        name: `Tangente (m = ${inclinacao.toFixed(4)})`,
-                        type: 'line',
-                        data: reta_x.map((x, i) => [reta_x[i], reta_y[i]]),
-                        lineStyle: { width: 3, color: '#e74c3c', type: 'dashed' },
-                        showSymbol: false,
-                        z: 8
-                    }, {
-                        name: 'Ponto de Tangência',
-                        type: 'scatter',
-                        data: [ponto],
-                        symbolSize: 20,
-                        itemStyle: {
-                            color: '#f39c12',
-                            borderColor: '#e67e22',
-                            borderWidth: 3
+                    series: [
+                        {
+                            name: "f(x)",
+                            type: "line",
+                            data: xs.map((x, i) => [x, ys[i]]),
+                            smooth: true,
+                            lineStyle: { width: 3 }
                         },
-                        label: {
-                            show: true,
-                            formatter: function (params) {
-                                const xVal = params.value[0];
-                                const yVal = params.value[1];
-                                if (typeof yVal === 'number' && isFinite(yVal)) {
-                                    return `(${xVal.toFixed(2)}, ${yVal.toFixed(2)})`;
-                                } else {
-                                    return `(${xVal.toFixed(2)}, n/a)`;
-                                }
-                            },
-                            position: 'top',
-                            color: '#333',
-                            fontWeight: 'bold',
-                            backgroundColor: 'rgba(255,255,255,0.95)',
-                            padding: [8, 12],
-                            borderRadius: 6,
-                            borderColor: '#f39c12',
-                            borderWidth: 1
+                        {
+                            name: `Tangente (m = ${m.toFixed(4)})`,
+                            type: "line",
+                            data: rx.map((x, i) => [rx[i], ry[i]]),
+                            lineStyle: { width: 3, type: "dashed", color: "#e74c3c" }
                         },
-                        z: 10
-                    }]
+                        {
+                            name: "Ponto",
+                            type: "scatter",
+                            data: [[x0, y0]],
+                            symbolSize: 20,
+                            itemStyle: { color: "#f39c12" }
+                        }
+                    ]
                 };
 
                 myChart.setOption(option);
             }
 
-            // usar slider da forma correta (slider_ponto_tangente_form)
-            const sliderTang = document.getElementById('slider_ponto_tangente_form');
-            const badgeTang = document.getElementById('val_ponto_tangente_form');
-
+            // Configura slider
             const xInicial = dadosOriginais.ponto_tangente.x;
-            // configura range conforme dados do eixo para melhorar UX
-            sliderTang.min = Math.min(...xs);
-            sliderTang.max = Math.max(...xs);
-            sliderTang.step = 0.1;
-            sliderTang.value = xInicial;
-            badgeTang.innerText = parseFloat(xInicial).toFixed(2);
+            slider.min = Math.min(...xs);
+            slider.max = Math.max(...xs);
+            slider.step = 0.1;
+            slider.value = xInicial;
+            badge.innerText = xInicial.toFixed(2);
 
-            renderizarGrafico(parseFloat(xInicial));
+            render(xInicial);
 
-            // Evento do slider
-            sliderTang.addEventListener('input', function (e) {
-                const xTangente = parseFloat(e.target.value);
-                badgeTang.innerText = xTangente.toFixed(2);
-                renderizarGrafico(xTangente);
+            slider.addEventListener("input", e => {
+                const val = parseFloat(e.target.value);
+                badge.innerText = val.toFixed(2);
+                render(val);
             });
+        }
+
+        // usar slider da forma correta (slider_ponto_tangente_form)
+        const sliderTang = document.getElementById('slider_ponto_tangente_form');
+        const badgeTang = document.getElementById('val_ponto_tangente_form');
+
+        const xInicial = dadosOriginais.ponto_tangente.x;
+        // configura range conforme dados do eixo para melhorar UX
+        sliderTang.min = Math.min(...xs);
+        sliderTang.max = Math.max(...xs);
+        sliderTang.step = 0.1;
+        sliderTang.value = xInicial;
+        badgeTang.innerText = parseFloat(xInicial).toFixed(2);
+
+        renderizarGrafico(parseFloat(xInicial));
+
+        // Evento do slider
+        sliderTang.addEventListener('input', function (e) {
+            const xTangente = parseFloat(e.target.value);
+            badgeTang.innerText = xTangente.toFixed(2);
+            renderizarGrafico(xTangente);
+        });
         }
 
         // =======================================
