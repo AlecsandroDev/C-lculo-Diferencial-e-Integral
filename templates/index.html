@@ -2,26 +2,35 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>CalcTool Pro - Calculadora Visual</title>
+
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <!-- REMOVIDO: polyfill QUEBRADO -->
+    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+
+    <!-- MathJax -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
+        /* ---------- Layout geral ---------- */
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .main-card {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             margin-bottom: 50px;
         }
@@ -34,195 +43,89 @@
         }
 
         .header-section h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin: 0;
         }
 
-        .header-section p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.95;
-            font-size: 1.1rem;
-        }
-
         .nav-tabs {
-            border-bottom: 2px solid #e0e0e0;
-            padding: 0 1rem;
+            border-bottom: 2px solid #e9ecef;
         }
 
-        .nav-tabs .nav-link {
-            border: none;
-            color: #666;
-            font-weight: 600;
-            padding: 1rem 1.5rem;
-            transition: all 0.3s;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: #667eea;
-        }
-
-        .nav-tabs .nav-link.active {
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-            background: transparent;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
+        /* ---------- Resultado + step-by-step ---------- */
         .resultado-card {
             background: #f8f9fa;
             border-radius: 15px;
             padding: 2rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             border: 1px solid #e9ecef;
         }
 
         .resultado-math {
             background: white;
-            padding: 2.5rem;
+            padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.25rem;
             text-align: center;
-            font-size: 1.2rem;
-            line-height: 2.8;
-        }
-
-        .step-by-step {
-            margin-top: 3rem;
-        }
-
-        .step-by-step h5 {
-            color: #667eea;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.95rem;
+            font-size: 1.05rem;
+            line-height: 2;
         }
 
         .step-item {
             background: white;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             border-left: 5px solid #667eea;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s;
-            font-size: 1.05rem;
-            line-height: 2.5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            font-size: 0.98rem;
         }
 
-        .step-item:hover {
-            transform: translateX(5px);
-        }
-
+        /* ---------- Chart + controls ---------- */
         #main-chart {
             background: white;
             border-radius: 10px;
             padding: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 1rem;
+            width: 100%;
+            height: 600px;
         }
 
         .controles-integral {
             background: white;
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: 10px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .area-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .area-box {
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-
-        .area-box:hover {
-            transform: translateY(-3px);
-        }
-
-        .area-box h6 {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.8rem;
-            font-weight: 600;
-        }
-
-        .area-box .valor {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 0.5rem 0;
-        }
-
-        .area-box small {
-            display: block;
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
         }
 
         .badge-dinamico {
             background: #667eea;
-            color: white;
-            padding: 0.4rem 1rem;
+            color: #fff;
+            padding: 0.35rem 0.85rem;
             border-radius: 20px;
             font-weight: 600;
         }
 
-        .config-aba {
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .area-box {
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-
     <div class="container">
         <div class="main-card">
             <div class="header-section">
                 <h1>📊 CalcTool Pro</h1>
-                <p>Visualização Interativa de Cálculo Diferencial e Integral</p>
+                <p>Visualização interativa de Cálculo Diferencial e Integral</p>
             </div>
 
+            <!-- NAV TABS -->
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link {% if aba_ativa == 'limite' %}active{% endif %}"
@@ -250,6 +153,7 @@
                 </li>
             </ul>
 
+            <!-- FORM CONTROLS -->
             <div class="p-4">
                 <form method="POST" action="/">
                     <input type="hidden" name="aba_ativa" id="input_aba_ativa" value="{{ aba_ativa }}">
@@ -258,11 +162,10 @@
                         <label class="form-label fw-bold">📐 Função f(x):</label>
                         <input type="text" class="form-control form-control-lg" name="funcao" value="{{ funcao }}"
                             placeholder="Ex: x**2, sin(x), 1/(x-2)" required>
-                        <small class="text-muted">
-                            Use: ** (potência), sqrt() (raiz), sin/cos/tan, exp(), log()
-                        </small>
+                        <small class="text-muted">Use: ** (potência), sqrt(), sin/cos/tan, exp(), log()</small>
                     </div>
 
+                    <!-- Limite config -->
                     <div class="config-aba" id="div-limite" {% if aba_ativa !='limite' %}style="display:none" {% endif
                         %}>
                         <label class="form-label">Ponto de tendência (x → p):</label>
@@ -271,17 +174,8 @@
                     </div>
 
 
-                    <div class="config-aba" id="div-derivada" {% if aba_ativa !='derivada' %}style="display:none" {%
-                        endif %}>
-                        <label class="form-label text-center w-100">
-                            Ponto da Reta Tangente: <span class="badge-dinamico" id="val_ponto_tangente_form">0</span>
-                        </label>
-                        <input type="range" class="form-range" min="-10" max="10" step="0.5" name="ponto_tangente"
-                            id="slider_ponto_tangente_form" value="{{ params.ponto_tangente }}">
-                        <input type="hidden" name="ponto_tangente" id="hidden_ponto_tangente"
-                            value="{{ params.ponto_tangente }}">
-                    </div>
 
+                    <!-- Integral config -->
                     <div class="config-aba" id="div-integral" {% if aba_ativa !='integral' %}style="display:none" {%
                         endif %}>
                         <div class="row g-3">
@@ -298,17 +192,14 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
-                        🚀 Calcular e Visualizar
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">🚀 Calcular e Visualizar</button>
                 </form>
             </div>
 
+            <!-- RESULTADO E GRÁFICOS -->
             {% if resultado %}
             <div class="resultado-card mx-4 mb-4">
-                <h4 class="text-center mb-4" style="color: #667eea; font-weight: 700;">
-                    📈 Resultado Final
-                </h4>
+                <h4 class="text-center mb-3" style="color: #667eea; font-weight:700;">📈 Resultado Final</h4>
 
                 <div class="resultado-math">
                     $$ {{ resultado | safe }} $$
@@ -316,65 +207,80 @@
 
                 {% if steps %}
                 <div class="step-by-step">
-                    <h5>📝 Resolução Passo a Passo</h5>
+                    <h5 style="color:#667eea; font-weight:700;">📝 Resolução Passo a Passo</h5>
                     {% for step in steps %}
-                    <div class="step-item">
-                        $$ {{ step | safe }} $$
-                    </div>
+                    <div class="step-item">$$ {{ step | safe }} $$</div>
                     {% endfor %}
                 </div>
                 {% endif %}
 
                 {% if dados_grafico %}
-                <hr class="my-5">
-                <h4 class="text-center mb-4" style="color: #667eea;">
-                    📊 Visualização Gráfica Interativa
-                </h4>
+                <hr class="my-4">
 
-                <div id="controles-dinamicos" style="display: none;">
+                <h4 class="text-center mb-3" style="color:#667eea;">📊 Visualização Gráfica Interativa</h4>
+
+                <!-- Controles dinâmicos (integral / sliders) -->
+                <div id="controles-dinamicos" style="display:none;">
                     <div class="controles-integral">
-                        <h6 class="text-center mb-3" style="color: #667eea; font-weight: 700;">
-                            🎚️ Controle Dinâmico de Aproximação
-                        </h6>
+                        <h6 style="color:#667eea; font-weight:700;" class="text-center">🎚️ Controle Dinâmico de
+                            Aproximação</h6>
 
-                        <div class="area-info">
-                            <div class="area-box"
-                                style="background: linear-gradient(135deg, #e8f4fc 0%, #c3e0f7 100%); border: 2px solid #3498db;">
-                                <h6 style="color: #2980b9;">Integral Líquida</h6>
-                                <div class="valor" id="integral_liquida_display" style="color: #2980b9;">-</div>
-                                <small class="text-muted">Soma Riemann: <strong
-                                        id="soma_liquida_display">-</strong></small>
-                                <small class="text-muted" style="font-size: 0.75rem;">Considera sinal (+ e -)</small>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="area-box"
+                                    style="background: linear-gradient(135deg,#e8f4fc 0%,#c3e0f7 100%); border:2px solid #3498db;">
+                                    <h6 style="color:#2980b9">Integral Líquida</h6>
+                                    <div class="valor" id="integral_liquida_display" style="color:#2980b9">-</div>
+                                    <small class="text-muted">Soma Riemann: <strong
+                                            id="soma_liquida_display">-</strong></small>
+                                </div>
                             </div>
-                            <div class="area-box"
-                                style="background: linear-gradient(135deg, #fef5e7 0%, #fdeaa8 100%); border: 2px solid #f39c12;">
-                                <h6 style="color: #e67e22;">Área Geométrica</h6>
-                                <div class="valor" id="area_geometrica_display" style="color: #e67e22;">-</div>
-                                <small class="text-muted">Soma Riemann: <strong
-                                        id="soma_absoluta_display">-</strong></small>
-                                <small class="text-muted" style="font-size: 0.75rem;">Sempre positiva (|f(x)|)</small>
+                            <div class="col-md-6">
+                                <div class="area-box"
+                                    style="background: linear-gradient(135deg,#fef5e7 0%,#fdeaa8 100%); border:2px solid #f39c12;">
+                                    <h6 style="color:#e67e22">Área Geométrica</h6>
+                                    <div class="valor" id="area_geometrica_display" style="color:#e67e22">-</div>
+                                    <small class="text-muted">Soma Riemann: <strong
+                                            id="soma_absoluta_display">-</strong></small>
+                                </div>
                             </div>
                         </div>
 
-                        <label class="form-label text-center w-100">
+                        <label class="form-label d-block text-center">
                             Número de Retângulos: <span class="badge-dinamico" id="val_n_dinamico">10</span>
                         </label>
-                        <input type="range" class="form-range" min="1" max="100" id="slider_dinamico" value="10">
+                        <input type="range" class="form-range" min="1" max="200" id="slider_dinamico" value="10">
                     </div>
                 </div>
 
-                <div id="main-chart" style="width: 100%; height: 600px;"></div>
+                <div id="controle-derivada" style="display:none; margin-top:20px;">
+                    <div class="controles-integral" style="padding:15px;">
+                        <label class="form-label d-block text-center">
+                            Ponto da Reta Tangente:
+                            <span class="badge-dinamico" id="val_ponto_tangente_form">0</span>
+                        </label>
+
+                        <input type="range" class="form-range" min="-10" max="10" step="0.1"
+                            id="slider_ponto_tangente_form" value="0">
+                    </div>
+                </div>
+
+                <div id="main-chart"></div>
                 {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
 
+    <!-- -------------- Scripts -------------- -->
     <script>
+        // Mudar aba (apenas altera o campo hidden e o visual local)
         function mudarAba(aba) {
             document.getElementById('input_aba_ativa').value = aba;
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+
+            try { event.target.classList.add('active'); } catch (e) { }
+
             document.querySelectorAll('.config-aba').forEach(el => el.style.display = 'none');
 
             if (aba === 'limite') {
@@ -386,13 +292,23 @@
             }
         }
     </script>
+
+    <!-- ---------- Script do gráfico ---------- -->
+    {% if dados_grafico %}
     <script>
-        {% if dados_grafico %}
         (function () {
-            const dadosOriginais = {{ dados_grafico | safe
+
+            const dadosOriginais = {{ dados_grafico | tojson | safe
         }};
+        console.log("DADOS:", dadosOriginais);
+
         const chartDom = document.getElementById('main-chart');
         const myChart = echarts.init(chartDom);
+
+        const xs = Array.isArray(dadosOriginais.eixo_x) ? dadosOriginais.eixo_x : [];
+        const ys = Array.isArray(dadosOriginais.eixo_y)
+            ? dadosOriginais.eixo_y.map(v => (typeof v === 'number' && isFinite(v) ? v : null))
+            : [];
 
         const commonConfig = {
             toolbox: {
@@ -404,102 +320,75 @@
                 right: 20,
                 top: 10
             },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { type: 'cross' }
-            },
-            grid: {
-                left: '8%',
-                right: '8%',
-                bottom: '15%',
-                top: '15%',
-                containLabel: true
-            },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+            grid: { left: '8%', right: '8%', bottom: '12%', top: '12%', containLabel: true },
             dataZoom: [
-                { type: 'inside', xAxisIndex: 0, filterMode: 'filter' },
-                { type: 'slider', xAxisIndex: 0, filterMode: 'filter', bottom: '5%' },
-                { type: 'inside', yAxisIndex: 0, filterMode: 'empty' }
+                { type: 'inside', xAxisIndex: 0 },
+                { type: 'slider', xAxisIndex: 0, bottom: '5%' }
             ],
-            xAxis: {
-                type: 'value',
-                name: 'x',
-                nameLocation: 'middle',
-                nameGap: 30,
-                minInterval: 1,
-                axisLabel: { formatter: '{value}' },
-                minorTick: { show: true },
-                splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
-            },
-            yAxis: {
-                type: 'value',
-                name: 'f(x)',
-                nameLocation: 'middle',
-                nameGap: 50,
-                minInterval: 1,
-                axisLabel: { formatter: '{value}' },
-                minorTick: { show: true },
-                splitLine: { show: true, lineStyle: { type: 'dashed', opacity: 0.3 } }
-            }
+            xAxis: { type: 'value', name: 'x', nameLocation: 'middle', nameGap: 28 },
+            yAxis: { type: 'value', name: 'f(x)', nameLocation: 'middle', nameGap: 40 }
         };
 
         let option = {};
 
-        // =======================================
-        // LIMITE - REFEITO
-        // =======================================
-        if (dadosOriginais.tipo === "limite") {
+        /* -------------------- LIMITE -------------------- */
+        if (dadosOriginais.tipo === 'limite') {
 
-            function safeFormat(x, y) {
-                if (typeof y === "number" && isFinite(y)) {
-                    return `(${x.toFixed(2)}, ${y.toFixed(2)})`;
-                }
-                return `(${x.toFixed(2)}, n/a)`;
-            }
-
-            const yReal = (typeof dadosOriginais.ponto_destaque.y === "number" && isFinite(dadosOriginais.ponto_destaque.y))
-                ? dadosOriginais.ponto_destaque.y
-                : null;
-
-            const isAberta = dadosOriginais.ponto_destaque.estilo === "aberta";
+            const pt = dadosOriginais.ponto_destaque || {};
+            const yHighlight = (typeof pt.y === 'number' && isFinite(pt.y)) ? pt.y : null;
+            const isAberta = pt.estilo === 'aberta';
 
             option = {
                 ...commonConfig,
-                title: {
-                    text: "Análise de Limite e Continuidade",
-                    left: "center",
-                    textStyle: { fontSize: 18, fontWeight: "bold" }
-                },
-                legend: {
-                    data: ["f(x)", isAberta ? "Bolinha Aberta (○)" : "Bolinha Fechada (●)"],
-                    top: 40
-                },
+                title: { text: 'Análise de Limite e Continuidade', left: 'center', textStyle: { fontSize: 16 } },
+                legend: { data: ['f(x)', isAberta ? 'Bolinha Aberta (○)' : 'Bolinha Fechada (●)'], top: 36 },
                 series: [
                     {
-                        name: "f(x)",
+                        name: "f(x) esquerda",
                         type: "line",
-                        data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                        smooth: true,
-                        lineStyle: { width: 3, color: "#667eea" },
-                        showSymbol: false
+                        connectNulls: false,
+                        data: dadosOriginais.eixo_x.map((x, i) => {
+                            const y = dadosOriginais.y_esquerda[i];
+                            return y === null ? null : [x, y];
+                        }),
+                        showSymbol: false,
                     },
                     {
-                        name: isAberta ? "Bolinha Aberta (○)" : "Bolinha Fechada (●)",
-                        type: "scatter",
-                        data: [[dadosOriginais.ponto_destaque.x, yReal]],
-                        symbolSize: 24,
+                        name: "f(x) direita",
+                        type: "line",
+                        connectNulls: false,
+                        data: dadosOriginais.eixo_x.map((x, i) => {
+                            const y = dadosOriginais.y_direita[i];
+                            return y === null ? null : [x, y];
+                        }),
+                        showSymbol: false,
+                    },
+                    {
+                        name: isAberta ? 'Bolinha Aberta (○)' : 'Bolinha Fechada (●)',
+                        type: 'scatter',
+                        data: [[pt.x, yHighlight]],
+                        symbolSize: 22,
                         itemStyle: {
-                            color: isAberta ? "white" : "#e74c3c",
-                            borderColor: "#e74c3c",
+                            color: isAberta ? '#ffffff' : '#e74c3c',
+                            borderColor: '#e74c3c',
                             borderWidth: 3
                         },
                         label: {
                             show: true,
-                            formatter: p => safeFormat(p.value[0], p.value[1]),
-                            position: "top",
-                            backgroundColor: "white",
+                            formatter: function (p) {
+                                const xv = p.value[0];
+                                const yv = p.value[1];
+                                return (typeof yv === 'number' && isFinite(yv))
+                                    ? `(${xv.toFixed(2)}, ${yv.toFixed(2)})`
+                                    : `(${xv.toFixed(2)}, n/a)`;
+                            },
+                            position: 'top',
+                            backgroundColor: 'rgba(255,255,255,0.95)',
                             padding: [6, 10],
                             borderRadius: 6
-                        }
+                        },
+                        z: 10
                     }
                 ]
             };
@@ -507,84 +396,87 @@
             myChart.setOption(option);
         }
 
-        // =======================================
-        // DERIVADA - REFEITO COM TANGENTE DINÂMICA
-        // =======================================
-        else if (dadosOriginais.tipo === "derivada") {
+        /* -------------------- DERIVADA -------------------- */
+        else if (dadosOriginais.tipo === 'derivada') {
+            document.getElementById('controle-derivada').style.display = 'block';
 
-            const slider = document.getElementById("slider_ponto_tangente_form") ||
-                document.getElementById("slider_dinamico");
-
-            const badge = document.getElementById("val_ponto_tangente_form") ||
-                document.getElementById("val_dinamico");
-
-            // Arrays numéricos
-            const xs = dadosOriginais.eixo_x.map(Number);
-            const ys = dadosOriginais.eixo_y.map(v => (typeof v === "number" ? v : NaN));
-
-            // ——— Função de interpolação ———
-            function interpola(x0) {
+            function interpolaY(x0) {
+                if (xs.length === 0) return NaN;
+                if (x0 <= xs[0]) return ys[0];
+                if (x0 >= xs[xs.length - 1]) return ys[ys.length - 1];
                 for (let i = 0; i < xs.length - 1; i++) {
-                    if (x0 >= xs[i] && x0 <= xs[i + 1]) {
-                        const t = (x0 - xs[i]) / (xs[i + 1] - xs[i]);
-                        return ys[i] + t * (ys[i + 1] - ys[i]);
+                    const x1 = xs[i], x2 = xs[i + 1];
+                    const y1 = ys[i], y2 = ys[i + 1];
+                    if (x0 >= x1 && x0 <= x2) {
+                        if (!isFinite(y1) || !isFinite(y2)) return NaN;
+                        const t = (x2 - x1) === 0 ? 0 : (x0 - x1) / (x2 - x1);
+                        return y1 + t * (y2 - y1);
                     }
                 }
                 return NaN;
             }
 
-            // ——— Derivada numérica (diferença central) ———
-            function derivada(x0) {
-                let i = xs.findIndex(x => x >= x0);
+            function estimaInclinação(x0) {
+                if (xs.length < 3) return 0;
+                let i = xs.findIndex(v => v >= x0);
+                if (i === -1) i = xs.length - 1;
                 i = Math.max(1, Math.min(i, xs.length - 2));
-
                 const xA = xs[i - 1], xB = xs[i + 1];
                 const yA = ys[i - 1], yB = ys[i + 1];
-
-                if (!isFinite(yA) || !isFinite(yB)) return 0;
-
+                if (!isFinite(yA) || !isFinite(yB) || (xB - xA) === 0) return 0;
                 return (yB - yA) / (xB - xA);
             }
 
-            // ——— Renderiza o gráfico ———
-            function render(x0) {
-                const y0 = interpola(x0);
-                const m = derivada(x0);
+            function renderTangente(xTangente) {
+                const y0 = interpolaY(xTangente);
+                const m = estimaInclinação(xTangente);
 
-                const rx = [x0 - 5, x0 + 5];
-                const ry = rx.map(x => m * (x - x0) + y0);
+                const rx = [xTangente - 5, xTangente + 5];
+                const ry = rx.map(x => m * (x - xTangente) + y0);
 
                 option = {
                     ...commonConfig,
-                    title: {
-                        text: `Tangente em x = ${x0.toFixed(2)}`,
-                        left: "center",
-                        textStyle: { fontSize: 18, fontWeight: "bold" }
-                    },
-                    legend: {
-                        data: ["f(x)", `Tangente (m = ${m.toFixed(4)})`, "Ponto"],
-                        top: 40
-                    },
+                    title: { text: `Derivada: Reta Tangente em x = ${xTangente.toFixed(2)}`, left: 'center' },
+                    legend: { data: ['f(x)', `Tangente (m = ${m.toFixed(4)})`, 'Ponto de Tangência'], top: 36 },
                     series: [
                         {
-                            name: "f(x)",
-                            type: "line",
+                            name: 'f(x)',
+                            type: 'line',
                             data: xs.map((x, i) => [x, ys[i]]),
                             smooth: true,
-                            lineStyle: { width: 3 }
+                            lineStyle: { width: 3, color: '#667eea' },
+                            showSymbol: false,
+                            connectNulls: false,
+                            z: 5
                         },
                         {
                             name: `Tangente (m = ${m.toFixed(4)})`,
-                            type: "line",
+                            type: 'line',
                             data: rx.map((x, i) => [rx[i], ry[i]]),
-                            lineStyle: { width: 3, type: "dashed", color: "#e74c3c" }
+                            lineStyle: { width: 3, type: 'dashed', color: '#e74c3c' },
+                            showSymbol: false,
+                            z: 8
                         },
                         {
-                            name: "Ponto",
-                            type: "scatter",
-                            data: [[x0, y0]],
-                            symbolSize: 20,
-                            itemStyle: { color: "#f39c12" }
+                            name: 'Ponto de Tangência',
+                            type: 'scatter',
+                            data: [[xTangente, y0]],
+                            symbolSize: 18,
+                            itemStyle: { color: '#f39c12', borderColor: '#e67e22', borderWidth: 2 },
+                            label: {
+                                show: true,
+                                formatter: function (p) {
+                                    const xv = p.value[0], yv = p.value[1];
+                                    return (typeof yv === 'number' && isFinite(yv))
+                                        ? `(${xv.toFixed(2)}, ${yv.toFixed(2)})`
+                                        : `(${xv.toFixed(2)}, n/a)`;
+                                },
+                                position: 'top',
+                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                padding: [6, 10],
+                                borderRadius: 6
+                            },
+                            z: 10
                         }
                     ]
                 };
@@ -592,214 +484,186 @@
                 myChart.setOption(option);
             }
 
-            // Configura slider
-            const xInicial = dadosOriginais.ponto_tangente.x;
-            slider.min = Math.min(...xs);
-            slider.max = Math.max(...xs);
-            slider.step = 0.1;
-            slider.value = xInicial;
-            badge.innerText = xInicial.toFixed(2);
+            const slider = document.getElementById('slider_ponto_tangente_form');
+            const badge = document.getElementById('val_ponto_tangente_form');
 
-            render(xInicial);
+            if (xs.length === 0) {
+                myChart.setOption({
+                    ...commonConfig,
+                    title: { text: 'Sem dados para derivada', left: 'center' }
+                });
+            } else {
+                const xInicial = 0;
 
-            slider.addEventListener("input", e => {
-                const val = parseFloat(e.target.value);
-                badge.innerText = val.toFixed(2);
-                render(val);
-            });
+                slider.min = Math.min(...xs);
+                slider.max = Math.max(...xs);
+                slider.step = (Math.max(...xs) - Math.min(...xs)) / (xs.length - 1) || 0.1;
+                slider.value = xInicial;
+                badge.innerText = parseFloat(xInicial).toFixed(2);
+
+                renderTangente(parseFloat(xInicial));
+
+                slider.addEventListener('input', function (e) {
+                    const val = parseFloat(e.target.value);
+                    badge.innerText = val.toFixed(2);
+                    renderTangente(val);
+                });
+            }
         }
 
-        // usar slider da forma correta (slider_ponto_tangente_form)
-        const sliderTang = document.getElementById('slider_ponto_tangente_form');
-        const badgeTang = document.getElementById('val_ponto_tangente_form');
-
-        const xInicial = dadosOriginais.ponto_tangente.x;
-        // configura range conforme dados do eixo para melhorar UX
-        sliderTang.min = Math.min(...xs);
-        sliderTang.max = Math.max(...xs);
-        sliderTang.step = 0.1;
-        sliderTang.value = xInicial;
-        badgeTang.innerText = parseFloat(xInicial).toFixed(2);
-
-        renderizarGrafico(parseFloat(xInicial));
-
-        // Evento do slider
-        sliderTang.addEventListener('input', function (e) {
-            const xTangente = parseFloat(e.target.value);
-            badgeTang.innerText = xTangente.toFixed(2);
-            renderizarGrafico(xTangente);
-        });
-        }
-
-        // =======================================
-        // PONTOS CRÍTICOS (manter igual)
-        // =======================================
+        /* -------------------- PONTOS CRÍTICOS -------------------- */
         else if (dadosOriginais.tipo === 'pontos_criticos') {
-            const cores = {
-                'Máximo': '#e74c3c',
-                'Mínimo': '#2ecc71',
-                'Inflexão': '#f39c12'
-            };
-
             option = {
                 ...commonConfig,
-                title: {
-                    text: 'Pontos Críticos (Máximos, Mínimos e Inflexão)',
-                    left: 'center',
-                    textStyle: { fontSize: 18, fontWeight: 'bold' }
-                },
-                legend: { data: ['f(x)', 'Máximos', 'Mínimos', 'Inflexão'], top: 40 },
-                series: [{
-                    name: 'f(x)',
-                    type: 'line',
-                    data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                    smooth: true,
-                    lineStyle: { width: 3, color: '#667eea' },
-                    showSymbol: false,
-                    connectNulls: false
-                }].concat(['Máximo', 'Mínimo', 'Inflexão'].map(tipo => ({
-                    name: tipo + 's',
-                    type: 'scatter',
-                    data: dadosOriginais.pontos.filter(p => p.tipo === tipo).map(p => [p.x, p.y]),
-                    symbolSize: 24,
-                    itemStyle: {
-                        color: cores[tipo],
-                        borderColor: cores[tipo],
-                        borderWidth: 3
+                title: { text: 'Pontos Críticos', left: 'center' },
+                legend: { top: 36 },
+                series: [
+                    {
+                        name: 'f(x)',
+                        type: 'line',
+                        data: xs.map((x, i) => [x, ys[i]]),
+                        smooth: true,
+                        lineStyle: { width: 3, color: '#667eea' },
+                        showSymbol: false,
+                        connectNulls: false
                     },
-                    label: {
-                        show: true,
-                        formatter: (params) => {
-                            const idx = dadosOriginais.pontos.findIndex(
-                                p => p.tipo === tipo && p.x === params.value[0]
-                            );
-                            return dadosOriginais.pontos[idx].label;
-                        },
-                        position: 'top',
-                        color: '#333',
-                        fontWeight: 'bold',
-                        backgroundColor: 'rgba(255,255,255,0.95)',
-                        padding: [8, 12],
-                        borderRadius: 6,
-                        borderColor: cores[tipo],
-                        borderWidth: 1
-                    }
-                })))
+                    ...(Array.isArray(dadosOriginais.pontos)
+                        ? dadosOriginais.pontos.map(p => ({
+                            name: p.tipo,
+                            type: 'scatter',
+                            data: [[p.x, p.y]],
+                            symbolSize: 22,
+                            itemStyle: {
+                                color:
+                                    p.tipo.includes("Máximo") ? '#e74c3c' :        // vermelho forte
+                                        p.tipo.includes("Mínimo") ? '#3498db' :        // azul forte
+                                            '#e67e22',                                     // laranja forte
+                                borderColor: '#000000',
+                                borderWidth: 0,
+                                opacity: 1       // <-- garante que não fica transparente
+                            }
+                        }))
+                        : [])
+                ]
             };
 
             myChart.setOption(option);
         }
 
-        // =======================================
-        // INTEGRAL (manter igual)
-        // =======================================
+        /* -------------------- INTEGRAL -------------------- */
         else if (dadosOriginais.tipo === 'integral') {
             document.getElementById('controles-dinamicos').style.display = 'block';
-            document.querySelector('.controles-integral h6').innerText = '🎚️ Controle Dinâmico de Aproximação';
-            document.querySelector('.area-info').style.display = 'grid'; // Mostrar boxes
 
             function calcularRetangulos(n) {
                 const a = dadosOriginais.intervalo[0];
                 const b = dadosOriginais.intervalo[1];
-                const delta_x = (b - a) / n;
-
-                const retangulos = [];
+                const delta = (b - a) / n;
+                const ret = [];
                 let soma_liquida = 0;
                 let soma_absoluta = 0;
 
                 for (let i = 0; i < n; i++) {
-                    const x_esq = a + i * delta_x;
-                    const idx = dadosOriginais.eixo_x.findIndex(x => x >= x_esq);
-                    const altura = dadosOriginais.eixo_y[idx] || 0;
-
-                    if (altura !== null) {
-                        retangulos.push({ x: x_esq, largura: delta_x, altura: altura });
-                        soma_liquida += altura * delta_x;
-                        soma_absoluta += Math.abs(altura * delta_x);
-                    }
+                    const x_esq = a + i * delta;
+                    const idx = xs.findIndex(x => x >= x_esq);
+                    const altura = (idx !== -1 && ys[idx] !== null) ? ys[idx] : 0;
+                    ret.push({ x: x_esq, largura: delta, altura: altura });
+                    soma_liquida += altura * delta;
+                    soma_absoluta += Math.abs(altura * delta);
                 }
 
-                return { retangulos, soma_liquida, soma_absoluta };
+                return { retangulos: ret, soma_liquida, soma_absoluta };
             }
 
-            function renderizarGrafico(n) {
+            function renderIntegral(n) {
                 const { retangulos, soma_liquida, soma_absoluta } = calcularRetangulos(n);
 
-                document.getElementById('integral_liquida_display').innerText = dadosOriginais.integral_liquida.toFixed(6);
-                document.getElementById('soma_liquida_display').innerText = soma_liquida.toFixed(6);
-                document.getElementById('area_geometrica_display').innerText = dadosOriginais.area_geometrica.toFixed(6);
-                document.getElementById('soma_absoluta_display').innerText = soma_absoluta.toFixed(6);
+                document.getElementById('integral_liquida_display').innerText =
+                    (dadosOriginais.integral_liquida ?? 0).toFixed(6);
+                document.getElementById('soma_liquida_display').innerText =
+                    soma_liquida.toFixed(6);
+
+                document.getElementById('area_geometrica_display').innerText =
+                    (dadosOriginais.area_geometrica ?? 0).toFixed(6);
+                document.getElementById('soma_absoluta_display').innerText =
+                    soma_absoluta.toFixed(6);
 
                 option = {
                     ...commonConfig,
-                    title: {
-                        text: `Soma de Riemann (n = ${n} retângulos)`,
-                        left: 'center',
-                        textStyle: { fontSize: 18, fontWeight: 'bold' }
-                    },
-                    legend: {
-                        data: ['f(x)', 'Retângulos (+)', 'Retângulos (-)'],
-                        top: 40
-                    },
-                    series: [{
-                        name: 'f(x)',
-                        type: 'line',
-                        data: dadosOriginais.eixo_x.map((x, i) => [x, dadosOriginais.eixo_y[i]]),
-                        smooth: true,
-                        lineStyle: { width: 3, color: '#667eea' },
-                        showSymbol: false,
-                        z: 10,
-                        connectNulls: false
-                    }, {
-                        name: 'Retângulos',
-                        type: 'custom',
-                        renderItem: function (params, api) {
-                            const dataIndex = params.dataIndex;
-                            const ret = retangulos[dataIndex];
-
-                            const x_inicio = api.coord([ret.x, 0])[0];
-                            const x_fim = api.coord([ret.x + ret.largura, 0])[0];
-                            const y_zero = api.coord([0, 0])[1];
-                            const y_val = api.coord([0, ret.altura])[1];
-
-                            const isPositivo = ret.altura >= 0;
-
-                            return {
-                                type: 'rect',
-                                shape: {
-                                    x: x_inicio,
-                                    y: Math.min(y_zero, y_val),
-                                    width: x_fim - x_inicio,
-                                    height: Math.abs(y_zero - y_val)
-                                },
-                                style: {
-                                    fill: isPositivo ? 'rgba(52, 152, 219, 0.5)' : 'rgba(231, 76, 60, 0.5)',
-                                    stroke: isPositivo ? 'rgba(52, 152, 219, 0.9)' : 'rgba(231, 76, 60, 0.9)',
-                                    lineWidth: 1
-                                }
-                            };
+                    title: { text: `Soma de Riemann (n = ${n})`, left: 'center' },
+                    legend: { data: ['f(x)', 'Retângulos'], top: 36 },
+                    series: [
+                        {
+                            name: 'f(x)',
+                            type: 'line',
+                            data: xs.map((x, i) => [x, ys[i]]),
+                            smooth: true,
+                            lineStyle: { width: 3, color: '#667eea' },
+                            showSymbol: false,
+                            connectNulls: false,
+                            z: 10
                         },
-                        data: retangulos,
-                        z: 5
-                    }]
+                        {
+                            name: 'Retângulos',
+                            type: 'custom',
+                            renderItem: function (params, api) {
+                                const idx = params.dataIndex;
+                                const r = retangulos[idx];
+                                if (!r) return null;
+
+                                const xStart = api.coord([r.x, 0])[0];
+                                const xEnd = api.coord([r.x + r.largura, 0])[0];
+                                const yZero = api.coord([0, 0])[1];
+                                const yVal = api.coord([0, r.altura])[1];
+
+                                return {
+                                    type: 'rect',
+                                    shape: {
+                                        x: xStart,
+                                        y: Math.min(yZero, yVal),
+                                        width: xEnd - xStart,
+                                        height: Math.abs(yZero - yVal)
+                                    },
+                                    style: {
+                                        fill: (r.altura >= 0)
+                                            ? 'rgba(52,152,219,0.45)'
+                                            : 'rgba(231,76,60,0.45)',
+                                        stroke: (r.altura >= 0)
+                                            ? 'rgba(52,152,219,0.9)'
+                                            : 'rgba(231,76,60,0.9)',
+                                        lineWidth: 1
+                                    }
+                                };
+                            },
+                            data: retangulos,
+                            z: 5
+                        }
+                    ]
                 };
 
                 myChart.setOption(option);
             }
 
-            const slider = document.getElementById('slider_dinamico');
-            slider.value = 10;
-            document.getElementById('val_n_dinamico').innerText = 10;
-            renderizarGrafico(10);
+            const sliderInt = document.getElementById('slider_dinamico');
+            const badgeN = document.getElementById('val_n_dinamico');
 
-            slider.addEventListener('input', function (e) {
-                const n = parseInt(e.target.value);
-                document.getElementById('val_n_dinamico').innerText = n;
-                renderizarGrafico(n);
-            });
+            if (sliderInt) {
+                const initN = parseInt(sliderInt.value || 10);
+                badgeN.innerText = initN;
+                renderIntegral(initN);
+
+                sliderInt.addEventListener('input', function (e) {
+                    const n = parseInt(e.target.value, 10) || 1;
+                    badgeN.innerText = n;
+                    renderIntegral(n);
+                });
+            }
         }
 
         window.addEventListener('resize', () => myChart.resize());
-}) ();
-        {% endif %}
+        }) ();
     </script>
+    {% endif %}
+
+</body>
+
+</html>
