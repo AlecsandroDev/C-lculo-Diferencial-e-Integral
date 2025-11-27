@@ -448,6 +448,8 @@
         // LIMITE - REFEITO
         // =======================================
         if (dadosOriginais.tipo === 'limite') {
+            // protege caso y seja null/undefined
+            const yHighlight = (typeof dadosOriginais.ponto_destaque.y === 'number') ? dadosOriginais.ponto_destaque.y : null;
             const isAberta = dadosOriginais.ponto_destaque.estilo === 'aberta';
 
             option = {
@@ -472,7 +474,7 @@
                 }, {
                     name: isAberta ? 'Descontinuidade (○)' : 'Contínua (●)',
                     type: 'scatter',
-                    data: [[dadosOriginais.ponto_destaque.x, dadosOriginais.ponto_destaque.y]],
+                    data: [[dadosOriginais.ponto_destaque.x, yHighlight]],
                     symbolSize: 24,
                     itemStyle: {
                         color: isAberta ? 'white' : '#e74c3c',
@@ -481,7 +483,16 @@
                     },
                     label: {
                         show: true,
-                        formatter: `(${dadosOriginais.ponto_destaque.x.toFixed(2)}, ${dadosOriginais.ponto_destaque.y.toFixed(2)})`,
+                        // usa função para evitar errors caso y seja null
+                        formatter: function (params) {
+                            const xVal = params.value[0];
+                            const yVal = params.value[1];
+                            if (typeof yVal === 'number') {
+                                return `(${xVal.toFixed(2)}, ${yVal.toFixed(2)})`;
+                            } else {
+                                return `(${xVal.toFixed(2)}, n/a)`;
+                            }
+                        },
                         position: 'top',
                         color: '#333',
                         fontWeight: 'bold',
@@ -502,20 +513,66 @@
         // DERIVADA - REFEITO COM TANGENTE DINÂMICA
         // =======================================
         else if (dadosOriginais.tipo === 'derivada') {
-            // Mostrar controles dinâmicos
+            // Mostrar controles dinâmicos (reutiliza a área de controles)
             document.getElementById('controles-dinamicos').style.display = 'block';
             document.querySelector('.controles-integral h6').innerText = '🎚️ Controle da Reta Tangente';
             document.querySelector('.area-info').style.display = 'none'; // Esconder boxes de área
 
+            // arrays numéricos do backend
+            const xs = dadosOriginais.eixo_x.map(v => parseFloat(v));
+            const ysRaw = dadosOriginais.eixo_y; // pode ter nulls
+            // converte para números ou NaN mantendo o mesmo índice
+            const ys = ysRaw.map(v => (typeof v === 'number' ? v : NaN));
+
+            // função auxiliar: interpola y no ponto x0 (linear entre vizinhos)
+            function interpolaY(x0) {
+                if (xs.length === 0) return NaN;
+                // se x0 está fora do range, faz extrapolação linear pelos extremos
+                if (x0 <= xs[0]) {
+                    return ys[0];
+                }
+                if (x0 >= xs[xs.length - 1]) {
+                    return ys[ys.length - 1];
+                }
+                // encontra intervalo [xi, xi+1] tal que xi <= x0 <= xi+1
+                for (let i = 0; i < xs.length - 1; i++) {
+                    const x1 = xs[i], x2 = xs[i + 1];
+                    const y1 = ys[i], y2 = ys[i + 1];
+                    if (x0 >= x1 && x0 <= x2) {
+                        if (!isFinite(y1) || !isFinite(y2)) return NaN;
+                        // evita divisão por zero
+                        const t = (x2 - x1) === 0 ? 0 : (x0 - x1) / (x2 - x1);
+                        return y1 + t * (y2 - y1);
+                    }
+                }
+                return NaN;
+            }
+
+            // função auxiliar: estima inclinação numérica no ponto x0 (diferença central)
+            function estimaInclinação(x0) {
+                // encontra índice mais próximo
+                let i = xs.findIndex(x => x >= x0);
+                if (i === -1) i = xs.length - 1;
+
+                // tenta central difference (i-1, i+1)
+                const i_minus = Math.max(0, i - 1);
+                const i_plus = Math.min(xs.length - 1, i + 1);
+
+                // se não houver vizinhos suficientes, usa forward/backward
+                const xA = xs[i_minus], xB = xs[i_plus];
+                const yA = ys[i_minus], yB = ys[i_plus];
+
+                if (!isFinite(yA) || !isFinite(yB) || (xB - xA) === 0) {
+                    return 0; // fallback
+                }
+
+                return (yB - yA) / (xB - xA);
+            }
+
             function calcularRetaTangente(xTangente) {
-                // Encontrar y0 = f(xTangente)
-                const idx = dadosOriginais.eixo_x.findIndex(x => x >= xTangente);
-                const y0 = dadosOriginais.eixo_y[idx] || 0;
+                const y0 = interpolaY(xTangente);
+                const m = estimaInclinação(xTangente);
 
-                // Calcular inclinação aproximada
-                const m = dadosOriginais.ponto_tangente.inclinacao; // Usar a inclinação calculada pelo backend
-
-                // Gerar pontos da reta tangente: y = m(x - x0) + y0
                 const reta_x = [xTangente - 5, xTangente + 5];
                 const reta_y = reta_x.map(x => m * (x - xTangente) + y0);
 
@@ -548,7 +605,7 @@
                     }, {
                         name: `Tangente (m = ${inclinacao.toFixed(4)})`,
                         type: 'line',
-                        data: reta_x.map((x, i) => [x, reta_y[i]]),
+                        data: reta_x.map((x, i) => [reta_x[i], reta_y[i]]),
                         lineStyle: { width: 3, color: '#e74c3c', type: 'dashed' },
                         showSymbol: false,
                         z: 8
@@ -564,7 +621,15 @@
                         },
                         label: {
                             show: true,
-                            formatter: `(${ponto[0].toFixed(2)}, ${ponto[1].toFixed(2)})`,
+                            formatter: function (params) {
+                                const xVal = params.value[0];
+                                const yVal = params.value[1];
+                                if (typeof yVal === 'number' && isFinite(yVal)) {
+                                    return `(${xVal.toFixed(2)}, ${yVal.toFixed(2)})`;
+                                } else {
+                                    return `(${xVal.toFixed(2)}, n/a)`;
+                                }
+                            },
                             position: 'top',
                             color: '#333',
                             fontWeight: 'bold',
@@ -581,21 +646,24 @@
                 myChart.setOption(option);
             }
 
-            // Configuração inicial
-            const slider = document.getElementById('slider_dinamico');
-            const xInicial = dadosOriginais.ponto_tangente.x;
-            slider.min = Math.min(...dadosOriginais.eixo_x);
-            slider.max = Math.max(...dadosOriginais.eixo_x);
-            slider.step = 0.5;
-            slider.value = xInicial;
-            document.getElementById('val_n_dinamico').innerText = xInicial.toFixed(2);
+            // usar slider da forma correta (slider_ponto_tangente_form)
+            const sliderTang = document.getElementById('slider_ponto_tangente_form');
+            const badgeTang = document.getElementById('val_ponto_tangente_form');
 
-            renderizarGrafico(xInicial);
+            const xInicial = dadosOriginais.ponto_tangente.x;
+            // configura range conforme dados do eixo para melhorar UX
+            sliderTang.min = Math.min(...xs);
+            sliderTang.max = Math.max(...xs);
+            sliderTang.step = 0.1;
+            sliderTang.value = xInicial;
+            badgeTang.innerText = parseFloat(xInicial).toFixed(2);
+
+            renderizarGrafico(parseFloat(xInicial));
 
             // Evento do slider
-            slider.addEventListener('input', function (e) {
+            sliderTang.addEventListener('input', function (e) {
                 const xTangente = parseFloat(e.target.value);
-                document.getElementById('val_n_dinamico').innerText = xTangente.toFixed(2);
+                badgeTang.innerText = xTangente.toFixed(2);
                 renderizarGrafico(xTangente);
             });
         }
