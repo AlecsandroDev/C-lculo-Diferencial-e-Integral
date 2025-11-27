@@ -11,53 +11,98 @@ def gerar_step_by_step(operacao, expr, params, x):
     
     if operacao == 'limite':
         ponto = float(params.get('ponto', 0))
-        steps.append(f"\\textbf{{1. Analisar o ponto }} x = {ponto}")
         
-        # Calcular limites laterais
-        l_esq = limit(expr, x, ponto, dir='-')
-        l_dir = limit(expr, x, ponto, dir='+')
+        steps.append(f"\\textbf{{Passo 1: Identificar o ponto de análise}}")
+        steps.append(f"\\text{{Queremos analisar }} x = {ponto}")
         
-        steps.append(f"\\textbf{{2. Calcular Limites Laterais}}")
-        steps.append(f"\\lim_{{x \\to {ponto}^-}} f(x) = {latex(l_esq)}")
-        steps.append(f"\\lim_{{x \\to {ponto}^+}} f(x) = {latex(l_dir)}")
+        steps.append(f"\\textbf{{Passo 2: Calcular os limites laterais}}")
         
-        steps.append(f"\\textbf{{3. Verificar se os limites laterais coincidem}}")
-        if l_esq == l_dir and l_esq.is_finite:
-            steps.append(f"\\text{{Limites laterais são iguais: }} \\lim_{{x \\to {ponto}}} f(x) = {latex(l_esq)}")
-            
-            steps.append(f"\\textbf{{4. Análise de Continuidade}}")
-            try:
-                valor_ponto = expr.subs(x, ponto)
-                if valor_ponto.is_finite and not valor_ponto.is_nan:
-                    if abs(float(valor_ponto) - float(l_esq)) < 1e-6:
-                        steps.append(f"f({ponto}) = {latex(valor_ponto)} = \\lim_{{x \\to {ponto}}} f(x)")
-                        steps.append(f"\\Rightarrow \\textbf{{Função Contínua (Bolinha Fechada)}}")
-                    else:
-                        steps.append(f"f({ponto}) = {latex(valor_ponto)} \\neq {latex(l_esq)} = \\lim_{{x \\to {ponto}}} f(x)")
-                        steps.append(f"\\Rightarrow \\textbf{{Descontinuidade Removível (Bolinha Aberta)}}")
+        try:
+            l_esq = limit(expr, x, ponto, dir='-')
+            steps.append(f"\\text{{Limite pela esquerda: }} \\lim_{{x \\to {ponto}^-}} f(x) = {latex(l_esq)}")
+        except:
+            l_esq = None
+            steps.append(f"\\text{{Limite pela esquerda: não calculável}}")
+        
+        try:
+            l_dir = limit(expr, x, ponto, dir='+')
+            steps.append(f"\\text{{Limite pela direita: }} \\lim_{{x \\to {ponto}^+}} f(x) = {latex(l_dir)}")
+        except:
+            l_dir = None
+            steps.append(f"\\text{{Limite pela direita: não calculável}}")
+        
+        steps.append(f"\\textbf{{Passo 3: Verificar se o limite existe}}")
+        
+        if l_esq is not None and l_dir is not None:
+            if l_esq.is_finite and l_dir.is_finite:
+                if abs(float(l_esq) - float(l_dir)) < 1e-6:
+                    steps.append(f"\\text{{Como }} \\lim_{{x \\to {ponto}^-}} = \\lim_{{x \\to {ponto}^+}} = {latex(l_esq)}")
+                    steps.append(f"\\text{{O limite existe: }} \\lim_{{x \\to {ponto}}} f(x) = {latex(l_esq)}")
+                    
+                    steps.append(f"\\textbf{{Passo 4: Testar continuidade}}")
+                    
+                    try:
+                        valor_funcao = expr.subs(x, ponto)
+                        if valor_funcao.is_finite and not valor_funcao.is_nan:
+                            steps.append(f"\\text{{Valor da função: }} f({ponto}) = {latex(valor_funcao)}")
+                            
+                            if abs(float(valor_funcao) - float(l_esq)) < 1e-6:
+                                steps.append(f"\\text{{Como }} f({ponto}) = \\lim_{{x \\to {ponto}}} f(x)")
+                                steps.append(f"\\Rightarrow \\textbf{{A função é CONTÍNUA em x = {ponto}}}")
+                                steps.append(f"\\textbf{{Representação: Bolinha Fechada (●)}}")
+                            else:
+                                steps.append(f"\\text{{Como }} f({ponto}) \\neq \\lim_{{x \\to {ponto}}} f(x)")
+                                steps.append(f"\\Rightarrow \\textbf{{DESCONTINUIDADE REMOVÍVEL em x = {ponto}}}")
+                                steps.append(f"\\textbf{{Representação: Bolinha Aberta (○)}}")
+                        else:
+                            steps.append(f"\\text{{A função }} f({ponto}) \\text{{ não está definida}}")
+                            steps.append(f"\\Rightarrow \\textbf{{DESCONTINUIDADE em x = {ponto}}}")
+                            steps.append(f"\\textbf{{Representação: Bolinha Aberta (○)}}")
+                    except:
+                        steps.append(f"\\text{{Erro ao calcular }} f({ponto})")
+                        steps.append(f"\\Rightarrow \\textbf{{DESCONTINUIDADE em x = {ponto}}}")
+                        steps.append(f"\\textbf{{Representação: Bolinha Aberta (○)}}")
                 else:
-                    steps.append(f"f({ponto}) \\text{{ é indefinido}}")
-                    steps.append(f"\\Rightarrow \\textbf{{Descontinuidade (Bolinha Aberta)}}")
-            except:
-                steps.append(f"f({ponto}) \\text{{ não pode ser calculado}}")
-                steps.append(f"\\Rightarrow \\textbf{{Descontinuidade (Bolinha Aberta)}}")
+                    steps.append(f"\\text{{Os limites laterais são DIFERENTES}}")
+                    steps.append(f"\\Rightarrow \\textbf{{O LIMITE NÃO EXISTE}}")
+            else:
+                steps.append(f"\\text{{Um ou ambos os limites são infinitos}}")
+                steps.append(f"\\Rightarrow \\textbf{{Comportamento assintótico}}")
         else:
-            steps.append(f"\\text{{Limites laterais diferentes ou infinitos}}")
-            steps.append(f"\\Rightarrow \\textbf{{Limite não existe}}")
+            steps.append(f"\\text{{Não foi possível calcular os limites laterais}}")
     
+    # ============================================================
+    # DERIVADA - REFEITO COM RETA TANGENTE
+    # ============================================================
     elif operacao == 'derivada':
-        steps.append(f"\\textbf{{1. Função Original}}")
+        steps.append(f"\\textbf{{Passo 1: Função Original}}")
         steps.append(f"f(x) = {latex(expr)}")
         
-        steps.append(f"\\textbf{{2. Calcular a Primeira Derivada}}")
+        steps.append(f"\\textbf{{Passo 2: Calcular a Derivada}}")
         derivada = diff(expr, x)
-        steps.append(f"f'(x) = {latex(derivada)}")
+        derivada_simp = simplify(derivada)
+        steps.append(f"f'(x) = {latex(derivada_simp)}")
         
-        steps.append(f"\\textbf{{3. Calcular a Segunda Derivada}}")
-        derivada2 = diff(derivada, x)
-        derivada2_simp = simplify(derivada2)
-        steps.append(f"f''(x) = {latex(derivada2_simp)}")
+        steps.append(f"\\textbf{{Passo 3: Interpretação Geométrica}}")
+        steps.append(f"\\text{{A derivada }} f'(x) \\text{{ representa a inclinação da reta tangente}}")
+        steps.append(f"\\text{{ao gráfico de }} f(x) \\text{{ em cada ponto}}")
+        
+        # Ponto inicial para a tangente
+        ponto_tangente = float(params.get('ponto_tangente', 0))
+        steps.append(f"\\textbf{{Passo 4: Reta Tangente em x = {ponto_tangente}}}")
+        
+        try:
+            y0 = float(expr.subs(x, ponto_tangente))
+            m = float(derivada_simp.subs(x, ponto_tangente))
+            
+            steps.append(f"\\text{{Ponto de tangência: }} P({ponto_tangente}, {y0:.4f})")
+            steps.append(f"\\text{{Inclinação (coeficiente angular): }} m = f'({ponto_tangente}) = {m:.4f}")
+            steps.append(f"\\text{{Equação da reta tangente: }} y - {y0:.4f} = {m:.4f}(x - {ponto_tangente})")
+            steps.append(f"y = {m:.4f}x + {(y0 - m*ponto_tangente):.4f}")
+        except:
+            steps.append(f"\\text{{Erro ao calcular reta tangente em x = {ponto_tangente}}}")
     
+    # ... (manter o restante: pontos_criticos e integral)
     elif operacao == 'pontos_criticos':
         steps.append(f"\\textbf{{1. Calcular a Primeira Derivada}}")
         derivada = diff(expr, x)
@@ -154,39 +199,59 @@ def calcular_matematica(funcao_str, operacao, params):
         if operacao == 'limite':
             ponto = float(params.get('ponto', 0))
             
-            l_esq = limit(expr, x, ponto, dir='-')
-            l_dir = limit(expr, x, ponto, dir='+')
-            l_glob = limit(expr, x, ponto)
+            # Calcular limites
+            try:
+                l_esq = limit(expr, x, ponto, dir='-')
+                l_dir = limit(expr, x, ponto, dir='+')
+                l_glob = limit(expr, x, ponto)
+            except:
+                l_esq = l_dir = l_glob = None
             
-            # Lógica CORRIGIDA de continuidade
+            # Determinar tipo de ponto (bolinha aberta ou fechada)
             tipo_ponto = "aberta"
-            y_ponto = 0
+            y_limite = 0
             
-            if l_glob.is_finite and not l_glob.is_nan:
-                y_ponto = float(l_glob)
+            if l_glob is not None and l_glob.is_finite and not l_glob.is_nan:
+                y_limite = float(l_glob)
+                
                 try:
-                    valor_no_ponto = expr.subs(x, ponto)
-                    if valor_no_ponto.is_finite and not valor_no_ponto.is_nan:
-                        if abs(float(valor_no_ponto) - y_ponto) < 1e-6:
-                            tipo_ponto = "fechada"  # Contínua
+                    valor_funcao = expr.subs(x, ponto)
+                    
+                    if valor_funcao.is_finite and not valor_funcao.is_nan:
+                        # Função está definida no ponto
+                        if abs(float(valor_funcao) - y_limite) < 1e-6:
+                            # f(p) = lim f(x) → CONTÍNUA → Bolinha Fechada
+                            tipo_ponto = "fechada"
                         else:
-                            tipo_ponto = "aberta"   # Descontinuidade removível
+                            # f(p) ≠ lim f(x) → DESCONTINUIDADE REMOVÍVEL → Bolinha Aberta
+                            tipo_ponto = "aberta"
                     else:
+                        # Função não definida → DESCONTINUIDADE → Bolinha Aberta
                         tipo_ponto = "aberta"
                 except:
+                    # Erro ao calcular → DESCONTINUIDADE → Bolinha Aberta
                     tipo_ponto = "aberta"
+            
+            # Montar resultado LaTeX
+            if l_esq is not None and l_dir is not None:
+                resultado_latex = (
+                    f"\\lim_{{x \\to {ponto}^-}} f(x) = {latex(l_esq)} \\\\[1.5em]"
+                    f"\\lim_{{x \\to {ponto}^+}} f(x) = {latex(l_dir)} \\\\[1.5em]"
+                )
+                
+                if l_glob is not None and l_glob.is_finite:
+                    resultado_latex += f"\\lim_{{x \\to {ponto}}} f(x) = {latex(l_glob)} \\\\[2em]"
+                    
+                    if tipo_ponto == "fechada":
+                        resultado_latex += f"\\textbf{{Conclusão: CONTÍNUA }} \\text{{(Bolinha Fechada ●)}}"
+                    else:
+                        resultado_latex += f"\\textbf{{Conclusão: DESCONTINUIDADE }} \\text{{(Bolinha Aberta ○)}}"
+                else:
+                    resultado_latex += f"\\textbf{{O limite não existe ou é infinito}}"
             else:
-                tipo_ponto = "aberta"
+                resultado_latex = f"\\text{{Erro ao calcular limites em x = {ponto}}}"
             
-            continuidade_texto = "Contínua (Bolinha Fechada)" if tipo_ponto == "fechada" else "Descontinuidade (Bolinha Aberta)"
-            
-            resultado_latex = (
-                f"\\lim_{{x \\to {ponto}^-}} f(x) = {latex(l_esq)} \\\\[1.5em]"
-                f"\\lim_{{x \\to {ponto}^+}} f(x) = {latex(l_dir)} \\\\[1.5em]"
-                f"\\lim_{{x \\to {ponto}}} f(x) = {latex(l_glob)} \\\\[2em]"
-                f"\\textbf{{Análise: }} \\text{{{continuidade_texto}}}"
-            )
-
+            # Gerar gráfico
             x_vals = np.linspace(ponto - 5, ponto + 5, 500)
             y_vals = gerar_pontos_seguros(expr, x_vals)
             
@@ -196,29 +261,52 @@ def calcular_matematica(funcao_str, operacao, params):
                 "eixo_y": y_vals,
                 "ponto_destaque": {
                     "x": float(ponto),
-                    "y": float(y_ponto),
-                    "estilo": tipo_ponto
+                    "y": float(y_limite),
+                    "estilo": tipo_ponto  # "fechada" ou "aberta"
                 }
             }
 
         # DERIVADA
         elif operacao == 'derivada':
             derivada_expr = diff(expr, x)
-            derivada2_expr = diff(derivada_expr, x)
-            derivada2_simp = simplify(derivada2_expr)
+            derivada_simp = simplify(derivada_expr)
             
-            resultado_latex = (
-                f"f'(x) = {latex(derivada_expr)} \\\\[2em]"
-                f"f''(x) = {latex(derivada2_simp)}"
-            )
+            # Ponto inicial da tangente
+            ponto_tangente = float(params.get('ponto_tangente', 0))
             
+            try:
+                y0 = float(expr.subs(x, ponto_tangente))
+                m = float(derivada_simp.subs(x, ponto_tangente))
+                
+                resultado_latex = (
+                    f"f'(x) = {latex(derivada_simp)} \\\\[2em]"
+                    f"\\text{{Reta tangente em }} x = {ponto_tangente}: \\\\[1em]"
+                    f"\\text{{Ponto: }} ({ponto_tangente}, {y0:.4f}) \\\\[0.5em]"
+                    f"\\text{{Inclinação: }} m = {m:.4f} \\\\[0.5em]"
+                    f"\\text{{Equação: }} y = {m:.4f}x + {(y0 - m*ponto_tangente):.4f}"
+                )
+            except:
+                resultado_latex = (
+                    f"f'(x) = {latex(derivada_simp)} \\\\[2em]"
+                    f"\\text{{Erro ao calcular reta tangente em x = {ponto_tangente}}}"
+                )
+                y0 = 0
+                m = 0
+            
+            # Gerar gráfico da função original
             x_vals = np.linspace(-10, 10, 500)
-            y_vals = gerar_pontos_seguros(derivada2_simp, x_vals)
+            y_vals = gerar_pontos_seguros(expr, x_vals)
             
             dados_grafico = {
                 "tipo": "derivada",
                 "eixo_x": x_vals.tolist(),
-                "eixo_y": y_vals
+                "eixo_y": y_vals,
+                "ponto_tangente": {
+                    "x": float(ponto_tangente),
+                    "y": float(y0),
+                    "inclinacao": float(m)
+                },
+                "derivada_expr": str(derivada_simp)  # Para recalcular dinamicamente
             }
 
         # PONTOS CRÍTICOS
@@ -343,13 +431,14 @@ def index():
     aba_ativa = "limite"
     erro = None
     
-    params = {'ponto': 0, 'int_a': 0, 'int_b': 5}
+    params = {'ponto': 0, 'ponto_tangente': 0, 'int_a': 0, 'int_b': 5}
 
     if request.method == 'POST':
         funcao_atual = request.form.get('funcao', '').strip()
         aba_ativa = request.form.get('aba_ativa', 'limite')
         
         params['ponto'] = request.form.get('ponto_limite', 0)
+        params['ponto_tangente'] = request.form.get('ponto_tangente', 0)
         params['int_a'] = request.form.get('int_a', 0)
         params['int_b'] = request.form.get('int_b', 5)
         
