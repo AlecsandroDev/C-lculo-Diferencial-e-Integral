@@ -2,666 +2,941 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CalcTool Pro - Calculadora Visual</title>
-
-    <!-- CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcMaster - Calculadora de Cálculo</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
 
     <!-- ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-
-    <!-- REMOVIDO: polyfill QUEBRADO -->
-    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
 
     <!-- MathJax -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* ---------- Layout geral ---------- */
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        /* --- Variáveis de Cor (Paleta Suave) --- */
+        :root {
+            --bg-paper: #FDFBF7;
+            --container-bg: #FFFFFF;
+            --primary-color: #6B8EAD;
+            --primary-hover: #557691;
+            --text-dark: #3F3F3F;
+            --text-light: #757575;
+            --border-color: #E0DFDB;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --step-bg: #f8f9fa;
         }
 
-        .main-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            margin-bottom: 50px;
+        /* Tema Escuro */
+        [data-theme="dark"] {
+            --bg-paper: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --primary-color: #81a3c4;
+            --primary-hover: #6b8fad;
+            --text-dark: #e8e8e8;
+            --text-light: #b0b0b0;
+            --border-color: #404040;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --step-bg: #363636;
         }
 
-        .header-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .header-section h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
+        /* --- Reset e Estilos Globais --- */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .nav-tabs {
-            border-bottom: 2px solid #e9ecef;
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--bg-paper);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM32 63c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm57-13c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1d1d1' fill-opacity='0.07' fill-rule='evenodd'/%3E%3C/svg%3E");
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* ---------- Resultado + step-by-step ---------- */
-        .resultado-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-top: 1.5rem;
-            border: 1px solid #e9ecef;
+        /* --- Header e Navbar --- */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--container-bg);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
-        .resultado-math {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            margin-bottom: 1.25rem;
-            text-align: center;
-            font-size: 1.05rem;
-            line-height: 2;
+        .project-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            transition: color 0.3s;
         }
 
-        .step-item {
-            background: white;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 5px solid #667eea;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            font-size: 0.98rem;
+        .navbar {
+            display: flex;
+            gap: 2rem;
         }
 
-        /* ---------- Chart + controls ---------- */
-        #main-chart {
-            background: white;
-            border-radius: 10px;
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-top: 1rem;
-            width: 100%;
-            height: 600px;
-        }
-
-        .controles-integral {
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-        }
-
-        .badge-dinamico {
-            background: #667eea;
-            color: #fff;
-            padding: 0.35rem 0.85rem;
-            border-radius: 20px;
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-light);
             font-weight: 600;
+            padding-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
         }
 
-        .area-box {
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .theme-toggle-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            cursor: pointer;
+            border-radius: 20px;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* --- Layout Principal (Grid de 2 Colunas) --- */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 2rem;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .panel-container {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* --- Painel Esquerdo --- */
+        .left-panel {
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            transition: color 0.3s;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Open Sans', sans-serif;
+            transition: all 0.3s;
+            background-color: var(--container-bg);
+            color: var(--text-dark);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .calc-button {
+            width: 100%;
             padding: 1rem;
-            border-radius: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .calc-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .step-by-step-section h3 {
+            font-family: 'Merriweather', serif;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            transition: color 0.3s;
+        }
+
+        .latex-step {
+            background-color: var(--step-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            border-radius: 4px;
+        }
+
+        /* --- Painel Direito --- */
+        .right-panel {
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .latex-answer-summary {
+            background-color: var(--bg-paper);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
             text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .latex-main-answer {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: color 0.3s;
+        }
+
+        .graph-container {
+            flex: 1;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            min-height: 400px;
+            transition: all 0.3s;
+        }
+
+        .x-axis-sidebar {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--bg-paper);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .sidebar-label {
+            display: block;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .x-range-slider {
+            width: 100%;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .x-range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .x-range-slider::-webkit-slider-thumb:hover {
+            background: var(--primary-hover);
+            transform: scale(1.2);
+        }
+
+        .x-range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .x-range-slider::-moz-range-thumb:hover {
+            background: var(--primary-hover);
+            transform: scale(1.2);
+        }
+
+        /* Esconde elementos quando não há resultado */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+
+            .left-panel,
+            .right-panel {
+                max-height: none;
+            }
+
+            body {
+                height: auto;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="main-card">
-            <div class="header-section">
-                <h1>📊 CalcTool Pro</h1>
-                <p>Visualização interativa de Cálculo Diferencial e Integral</p>
-            </div>
 
-            <!-- NAV TABS -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link {% if aba_ativa == 'limite' %}active{% endif %}"
-                        onclick="mudarAba('limite')">
-                        Limites
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link {% if aba_ativa == 'derivada' %}active{% endif %}"
-                        onclick="mudarAba('derivada')">
-                        Derivada
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link {% if aba_ativa == 'pontos_criticos' %}active{% endif %}"
-                        onclick="mudarAba('pontos_criticos')">
-                        Pontos Críticos
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link {% if aba_ativa == 'integral' %}active{% endif %}"
-                        onclick="mudarAba('integral')">
-                        Integral
-                    </button>
-                </li>
-            </ul>
+    <header class="main-header">
+        <div class="project-title">CalcMaster</div>
+        <nav class="navbar">
+            <a class="nav-link {% if aba_ativa == 'limite' %}active{% endif %}" data-aba="limite">Limite</a>
+            <a class="nav-link {% if aba_ativa == 'derivada' %}active{% endif %}" data-aba="derivada">Derivadas</a>
+            <a class="nav-link {% if aba_ativa == 'pontos_criticos' %}active{% endif %}"
+                data-aba="pontos_criticos">Pontos Críticos</a>
+            <a class="nav-link {% if aba_ativa == 'integral' %}active{% endif %}" data-aba="integral">Integral</a>
+        </nav>
+        <button class="theme-toggle-btn" id="themeToggle">
+            🌙 Tema Escuro
+        </button>
+    </header>
 
-            <!-- FORM CONTROLS -->
-            <div class="p-4">
-                <form method="POST" action="/">
-                    <input type="hidden" name="aba_ativa" id="input_aba_ativa" value="{{ aba_ativa }}">
+    <main class="main-content">
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">📐 Função f(x):</label>
-                        <input type="text" class="form-control form-control-lg" name="funcao" value="{{ funcao }}"
-                            placeholder="Ex: x**2, sin(x), 1/(x-2)" required>
-                        <small class="text-muted">Use: ** (potência), sqrt(), sin/cos/tan, exp(), log()</small>
-                    </div>
+        <section class="panel-container left-panel">
+            <form method="POST" action="/" id="calcForm">
+                <input type="hidden" name="aba_ativa" id="input_aba_ativa" value="{{ aba_ativa }}">
 
-                    <!-- Limite config -->
-                    <div class="config-aba" id="div-limite" {% if aba_ativa !='limite' %}style="display:none" {% endif
-                        %}>
-                        <label class="form-label">Ponto de tendência (x → p):</label>
-                        <input type="number" step="any" class="form-control" name="ponto_limite"
-                            value="{{ params.ponto }}">
-                    </div>
-
-
-
-                    <!-- Integral config -->
-                    <div class="config-aba" id="div-integral" {% if aba_ativa !='integral' %}style="display:none" {%
-                        endif %}>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Início do intervalo (a):</label>
-                                <input type="number" step="any" class="form-control" name="int_a"
-                                    value="{{ params.int_a }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fim do intervalo (b):</label>
-                                <input type="number" step="any" class="form-control" name="int_b"
-                                    value="{{ params.int_b }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">🚀 Calcular e Visualizar</button>
-                </form>
-            </div>
-
-            <!-- RESULTADO E GRÁFICOS -->
-            {% if resultado %}
-            <div class="resultado-card mx-4 mb-4">
-                <h4 class="text-center mb-3" style="color: #667eea; font-weight:700;">📈 Resultado Final</h4>
-
-                <div class="resultado-math">
-                    $$ {{ resultado | safe }} $$
+                <div class="input-group">
+                    <label for="funcao" class="input-label">Função f(x)</label>
+                    <input type="text" id="funcao" name="funcao" class="input-field"
+                        placeholder="Ex: x**2, sin(x), 1/(x-2)" value="{{ funcao }}" required>
+                    <small style="color: var(--text-light); margin-top: 0.25rem; display: block;">
+                        Use: ** (potência), sqrt(), sin/cos/tan, exp(), log()
+                    </small>
                 </div>
 
+                <!-- Campos específicos por aba -->
+                <div class="input-group aba-config" id="config-limite" {% if aba_ativa !='limite'
+                    %}style="display:none;" {% endif %}>
+                    <label for="ponto_limite" class="input-label">Ponto de tendência (x → p)</label>
+                    <input type="number" step="any" id="ponto_limite" name="ponto_limite" class="input-field"
+                        value="{{ params.ponto }}">
+                </div>
+
+                <div class="input-group aba-config" id="config-derivada" {% if aba_ativa !='derivada'
+                    %}style="display:none;" {% endif %}>
+                    <label for="ponto_tangente" class="input-label">Ponto da tangente (opcional)</label>
+                    <input type="number" step="any" id="ponto_tangente" name="ponto_tangente" class="input-field"
+                        value="{{ params.ponto_tangente }}" placeholder="0">
+                </div>
+
+                <div class="aba-config" id="config-integral" {% if aba_ativa !='integral' %}style="display:none;" {%
+                    endif %}>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="input-group">
+                            <label for="int_a" class="input-label">Início (a)</label>
+                            <input type="number" step="any" id="int_a" name="int_a" class="input-field"
+                                value="{{ params.int_a }}">
+                        </div>
+                        <div class="input-group">
+                            <label for="int_b" class="input-label">Fim (b)</label>
+                            <input type="number" step="any" id="int_b" name="int_b" class="input-field"
+                                value="{{ params.int_b }}">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="calc-button">Calcular</button>
+            </form>
+
+            <div class="step-by-step-section {% if not steps %}hidden{% endif %}" id="stepsSection">
+                <h3>Resolução Passo a Passo</h3>
                 {% if steps %}
-                <div class="step-by-step">
-                    <h5 style="color:#667eea; font-weight:700;">📝 Resolução Passo a Passo</h5>
-                    {% for step in steps %}
-                    <div class="step-item">$$ {{ step | safe }} $$</div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                {% if dados_grafico %}
-                <hr class="my-4">
-
-                <h4 class="text-center mb-3" style="color:#667eea;">📊 Visualização Gráfica Interativa</h4>
-
-                <!-- Controles dinâmicos (integral / sliders) -->
-                <div id="controles-dinamicos" style="display:none;">
-                    <div class="controles-integral">
-                        <h6 style="color:#667eea; font-weight:700;" class="text-center">🎚️ Controle Dinâmico de
-                            Aproximação</h6>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <div class="area-box"
-                                    style="background: linear-gradient(135deg,#e8f4fc 0%,#c3e0f7 100%); border:2px solid #3498db;">
-                                    <h6 style="color:#2980b9">Integral Líquida</h6>
-                                    <div class="valor" id="integral_liquida_display" style="color:#2980b9">-</div>
-                                    <small class="text-muted">Soma Riemann: <strong
-                                            id="soma_liquida_display">-</strong></small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="area-box"
-                                    style="background: linear-gradient(135deg,#fef5e7 0%,#fdeaa8 100%); border:2px solid #f39c12;">
-                                    <h6 style="color:#e67e22">Área Geométrica</h6>
-                                    <div class="valor" id="area_geometrica_display" style="color:#e67e22">-</div>
-                                    <small class="text-muted">Soma Riemann: <strong
-                                            id="soma_absoluta_display">-</strong></small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <label class="form-label d-block text-center">
-                            Número de Retângulos: <span class="badge-dinamico" id="val_n_dinamico">10</span>
-                        </label>
-                        <input type="range" class="form-range" min="1" max="200" id="slider_dinamico" value="10">
-                    </div>
-                </div>
-
-                <div id="controle-derivada" style="display:none; margin-top:20px;">
-                    <div class="controles-integral" style="padding:15px;">
-                        <label class="form-label d-block text-center">
-                            Ponto da Reta Tangente:
-                            <span class="badge-dinamico" id="val_ponto_tangente_form">0</span>
-                        </label>
-
-                        <input type="range" class="form-range" min="-10" max="10" step="0.1"
-                            id="slider_ponto_tangente_form" value="0">
-                    </div>
-                </div>
-
-                <div id="main-chart"></div>
+                {% for step in steps %}
+                <div class="latex-step">$$ {{ step | safe }} $$</div>
+                {% endfor %}
                 {% endif %}
             </div>
-            {% endif %}
-        </div>
-    </div>
+        </section>
 
-    <!-- -------------- Scripts -------------- -->
+        <section class="panel-container right-panel">
+
+            <div class="latex-answer-summary {% if not resultado %}hidden{% endif %}" id="resultSection">
+                <p style="color: var(--text-light); margin-bottom: 0.5rem;">Resposta Final:</p>
+                <div class="latex-main-answer">
+                    {% if resultado %}
+                    $$ {{ resultado | safe }} $$
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="graph-container" id="mainChart"></div>
+
+            <div class="x-axis-sidebar {% if not dados_grafico or dados_grafico.tipo != 'derivada' %}hidden{% endif %}"
+                id="xAxisControl">
+                <span class="sidebar-label">Ponto da Tangente: <span id="xValueDisplay">0.00</span></span>
+                <input type="range" min="-10" max="10" step="0.1" value="0" class="x-range-slider" id="xAxisSlider">
+            </div>
+
+            <div class="x-axis-sidebar {% if not dados_grafico or dados_grafico.tipo != 'integral' %}hidden{% endif %}"
+                id="integralControl">
+                <span class="sidebar-label">Número de Retângulos: <span id="nRetDisplay">10</span></span>
+                <input type="range" min="1" max="200" value="10" class="x-range-slider" id="nRetSlider">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div style="text-align: center;">
+                        <small style="color: var(--text-light);">Integral Líquida</small>
+                        <div style="font-weight: bold; color: var(--primary-color);" id="integralLiquida">-</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <small style="color: var(--text-light);">Área Geométrica</small>
+                        <div style="font-weight: bold; color: var(--primary-color);" id="areaGeometrica">-</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
     <script>
-        // Mudar aba (apenas altera o campo hidden e o visual local)
-        function mudarAba(aba) {
-            document.getElementById('input_aba_ativa').value = aba;
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        // ===== TEMA =====
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
 
-            try { event.target.classList.add('active'); } catch (e) { }
+        // Carrega tema salvo
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateThemeButton(savedTheme);
 
-            document.querySelectorAll('.config-aba').forEach(el => el.style.display = 'none');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
 
-            if (aba === 'limite') {
-                document.getElementById('div-limite').style.display = 'block';
-            } else if (aba === 'derivada') {
-                document.getElementById('div-derivada').style.display = 'block';
-            } else if (aba === 'integral') {
-                document.getElementById('div-integral').style.display = 'block';
+            // Atualiza gráfico se existir
+            if (window.myChart) {
+                const chartDom = document.getElementById('mainChart');
+                window.myChart.dispose();
+                window.myChart = echarts.init(chartDom, newTheme === 'dark' ? 'dark' : undefined);
+
+                // Re-renderiza o gráfico atual
+                if (typeof window.currentRenderFunction === 'function') {
+                    window.currentRenderFunction();
+                }
             }
+        });
+
+        function updateThemeButton(theme) {
+            themeToggle.innerHTML = theme === 'light' ? '🌙 Tema Escuro' : '☀️ Tema Claro';
         }
-    </script>
 
-    <!-- ---------- Script do gráfico ---------- -->
-    {% if dados_grafico %}
-    <script>
+        // ===== NAVEGAÇÃO =====
+        const navLinks = document.querySelectorAll('.nav-link');
+        const abaInput = document.getElementById('input_aba_ativa');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const aba = link.getAttribute('data-aba');
+
+                // Atualiza visual
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Atualiza campo hidden
+                abaInput.value = aba;
+
+                // Mostra/oculta campos
+                document.querySelectorAll('.aba-config').forEach(el => el.style.display = 'none');
+                const configEl = document.getElementById(`config-${aba}`);
+                if (configEl) configEl.style.display = 'block';
+            });
+        });
+
+        // ===== GRÁFICO =====
+        {% if dados_grafico %}
         (function () {
-
             const dadosOriginais = {{ dados_grafico | tojson | safe
         }};
+        const chartDom = document.getElementById('mainChart');
 
-        const chartDom = document.getElementById('main-chart');
-        const myChart = echarts.init(chartDom);
+        function renderChart() {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            if (window.myChart) window.myChart.dispose();
+            window.myChart = echarts.init(chartDom, isDark ? 'dark' : undefined);
 
-        const xs = Array.isArray(dadosOriginais.eixo_x) ? dadosOriginais.eixo_x : [];
-        const ys = Array.isArray(dadosOriginais.eixo_y)
-            ? dadosOriginais.eixo_y.map(v => (typeof v === 'number' && isFinite(v) ? v : null))
-            : [];
+            const xs = Array.isArray(dadosOriginais.eixo_x) ? dadosOriginais.eixo_x : [];
+            const ys = Array.isArray(dadosOriginais.eixo_y)
+                ? dadosOriginais.eixo_y.map(v => (typeof v === 'number' && isFinite(v) ? v : null))
+                : [];
 
-        const commonConfig = {
-            toolbox: {
-                feature: {
-                    dataZoom: { yAxisIndex: 'none' },
-                    restore: {},
-                    saveAsImage: { name: 'calctool_grafico' }
+            const commonConfig = {
+                toolbox: {
+                    feature: {
+                        restore: {},
+                        saveAsImage: { name: 'calcmaster_grafico' }
+                    },
+                    right: 20,
+                    top: 10
                 },
-                right: 20,
-                top: 10
-            },
-            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-            grid: { left: '8%', right: '8%', bottom: '12%', top: '12%', containLabel: true },
-            dataZoom: [
-                { type: 'inside', xAxisIndex: 0 },
-                { type: 'slider', xAxisIndex: 0, bottom: '5%' }
-            ],
-            xAxis: { type: 'value', name: 'x', nameLocation: 'middle', nameGap: 28 },
-            yAxis: { type: 'value', name: 'f(x)', nameLocation: 'middle', nameGap: 40 }
-        };
-
-        let option = {};
-
-        /* -------------------- LIMITE -------------------- */
-        if (dadosOriginais.tipo === 'limite') {
-
-            const pt = dadosOriginais.ponto_destaque || {};
-            const yHighlight = (typeof pt.y === 'number' && isFinite(pt.y)) ? pt.y : null;
-            const isAberta = pt.estilo === 'aberta';
-
-            option = {
-                ...commonConfig,
-                title: { text: 'Análise de Limite e Continuidade', left: 'center', textStyle: { fontSize: 16 } },
-                legend: { data: ['f(x)', isAberta ? 'Bolinha Aberta (○)' : 'Bolinha Fechada (●)'], top: 36 },
-                series: [
-                    {
-                        name: "f(x) esquerda",
-                        type: "line",
-                        connectNulls: false,
-                        data: dadosOriginais.eixo_x.map((x, i) => {
-                            const y = dadosOriginais.y_esquerda[i];
-                            return y === null ? null : [x, y];
-                        }),
-                        showSymbol: false,
-                    },
-                    {
-                        name: "f(x) direita",
-                        type: "line",
-                        connectNulls: false,
-                        data: dadosOriginais.eixo_x.map((x, i) => {
-                            const y = dadosOriginais.y_direita[i];
-                            return y === null ? null : [x, y];
-                        }),
-                        showSymbol: false,
-                    },
-                    {
-                        name: isAberta ? 'Bolinha Aberta (○)' : 'Bolinha Fechada (●)',
-                        type: 'scatter',
-                        data: [[pt.x, yHighlight]],
-                        symbolSize: 22,
-                        itemStyle: {
-                            color: isAberta ? '#ffffff' : '#e74c3c',
-                            borderColor: '#e74c3c',
-                            borderWidth: 3
-                        },
-                        label: {
-                            show: true,
-                            formatter: function (p) {
-                                const xv = p.value[0];
-                                const yv = p.value[1];
-                                return (typeof yv === 'number' && isFinite(yv))
-                                    ? `(${xv.toFixed(2)}, ${yv.toFixed(2)})`
-                                    : `(${xv.toFixed(2)}, n/a)`;
-                            },
-                            position: 'top',
-                            backgroundColor: 'rgba(255,255,255,0.95)',
-                            padding: [6, 10],
-                            borderRadius: 6
-                        },
-                        z: 10
-                    }
-                ]
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+                grid: { left: '10%', right: '10%', bottom: '15%', top: '15%', containLabel: true },
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: 0 },
+                    { type: 'slider', xAxisIndex: 0, bottom: '5%' }
+                ],
+                xAxis: { type: 'value', name: 'x', nameLocation: 'middle', nameGap: 30 },
+                yAxis: { type: 'value', name: 'f(x)', nameLocation: 'middle', nameGap: 50 }
             };
 
-            myChart.setOption(option);
-        }
+            let option = {};
 
-        /* -------------------- DERIVADA -------------------- */
-        else if (dadosOriginais.tipo === 'derivada') {
-            document.getElementById('controle-derivada').style.display = 'block';
+            /* -------------------- LIMITE -------------------- */
+            if (dadosOriginais.tipo === 'limite') {
+                const pt = dadosOriginais.ponto_destaque || {};
+                const yHighlight = (typeof pt.y === 'number' && isFinite(pt.y)) ? pt.y : null;
+                const estilo = pt.estilo || 'nao_existe';
+                const isAberta = (estilo === 'aberta');
 
-            function interpolaY(x0) {
-                if (xs.length === 0) return NaN;
-                if (x0 <= xs[0]) return ys[0];
-                if (x0 >= xs[xs.length - 1]) return ys[ys.length - 1];
-                for (let i = 0; i < xs.length - 1; i++) {
-                    const x1 = xs[i], x2 = xs[i + 1];
-                    const y1 = ys[i], y2 = ys[i + 1];
-                    if (x0 >= x1 && x0 <= x2) {
-                        if (!isFinite(y1) || !isFinite(y2)) return NaN;
-                        const t = (x2 - x1) === 0 ? 0 : (x0 - x1) / (x2 - x1);
-                        return y1 + t * (y2 - y1);
-                    }
-                }
-                return NaN;
-            }
-
-            function estimaInclinação(x0) {
-                if (xs.length < 3) return 0;
-                let i = xs.findIndex(v => v >= x0);
-                if (i === -1) i = xs.length - 1;
-                i = Math.max(1, Math.min(i, xs.length - 2));
-                const xA = xs[i - 1], xB = xs[i + 1];
-                const yA = ys[i - 1], yB = ys[i + 1];
-                if (!isFinite(yA) || !isFinite(yB) || (xB - xA) === 0) return 0;
-                return (yB - yA) / (xB - xA);
-            }
-
-            function renderTangente(xTangente) {
-                const y0 = interpolaY(xTangente);
-                const m = estimaInclinação(xTangente);
-
-                const rx = [xTangente - 1, xTangente + 1];
-                const ry = rx.map(x => m * (x - xTangente) + y0);
+                let labelPonto = 'Ponto';
+                if (isAberta) labelPonto = 'Descont. Removível (○)';
+                else if (estilo === 'fechada') labelPonto = 'Função Contínua (●)';
 
                 option = {
                     ...commonConfig,
-                    title: { text: `Derivada: Reta Tangente em x = ${xTangente.toFixed(2)}`, left: 'center' },
-                    legend: { data: ['f(x)', `Tangente (m = ${m.toFixed(4)})`, 'Ponto de Tangência'], top: 36 },
+                    title: { text: 'Análise de Limite', left: 'center', textStyle: { fontSize: 16 } },
+                    legend: { data: ['f(x)', labelPonto], top: 40 },
                     series: [
                         {
-                            name: 'f(x)',
-                            type: 'line',
-                            data: xs.map((x, i) => [x, ys[i]]),
-                            smooth: true,
-                            lineStyle: { width: 2, color: '#667eea' },
-                            showSymbol: false,
+                            name: "f(x)",
+                            type: "line",
                             connectNulls: false,
-                            z: 4
-                        },
-                        {
-                            name: `Tangente (m = ${m.toFixed(4)})`,
-                            type: 'line',
-                            data: rx.map((x, i) => [rx[i], ry[i]]),
-                            lineStyle: { width: 3, type: 'dashed', color: '#e74c3c' },
+                            data: dadosOriginais.eixo_x.map((x, i) => {
+                                const y = dadosOriginais.y_esquerda ? dadosOriginais.y_esquerda[i] : null;
+                                return y === null ? null : [x, y];
+                            }),
                             showSymbol: false,
-                            z: 8
+                            lineStyle: { width: 3 }
                         },
                         {
-                            name: 'Ponto de Tangência',
+                            name: "f(x)",
+                            type: "line",
+                            connectNulls: false,
+                            data: dadosOriginais.eixo_x.map((x, i) => {
+                                const y = dadosOriginais.y_direita ? dadosOriginais.y_direita[i] : null;
+                                return y === null ? null : [x, y];
+                            }),
+                            showSymbol: false,
+                            lineStyle: { width: 3 }
+                        },
+                        ...(yHighlight !== null ? [{
+                            name: labelPonto,
                             type: 'scatter',
-                            data: [[xTangente, y0]],
-                            symbolSize: 18,
-                            itemStyle: { color: '#f39c12', borderColor: '#e67e22', borderWidth: 2 },
+                            data: [[pt.x, yHighlight]],
+                            symbolSize: 22,
+                            itemStyle: {
+                                color: isAberta ? '#ffffff' : '#e74c3c',
+                                borderColor: '#e74c3c',
+                                borderWidth: 3
+                            },
                             label: {
                                 show: true,
-                                formatter: function (p) {
-                                    const xv = p.value[0], yv = p.value[1];
-                                    return (typeof yv === 'number' && isFinite(yv))
-                                        ? `(${xv.toFixed(2)}, ${yv.toFixed(2)})`
-                                        : `(${xv.toFixed(2)}, n/a)`;
-                                },
+                                formatter: (p) => `(${p.value[0].toFixed(2)}, ${p.value[1].toFixed(2)})`,
                                 position: 'top',
                                 backgroundColor: 'rgba(255,255,255,0.95)',
                                 padding: [6, 10],
-                                borderRadius: 6
+                                borderRadius: 6,
+                                color: '#333'
                             },
                             z: 10
-                        }
+                        }] : [])
                     ]
                 };
 
-                myChart.setOption(option);
+                window.myChart.setOption(option);
+
+                // Salva função para re-renderizar ao trocar tema
+                window.currentRenderFunction = function () {
+                    window.myChart.setOption(option);
+                };
             }
 
-            const slider = document.getElementById('slider_ponto_tangente_form');
-            const badge = document.getElementById('val_ponto_tangente_form');
-
-            if (xs.length === 0) {
-                myChart.setOption({
-                    ...commonConfig,
-                    title: { text: 'Sem dados para derivada', left: 'center' }
-                });
-            } else {
-                const xInicial = 0;
-
-                slider.min = Math.min(...xs);
-                slider.max = Math.max(...xs);
-                slider.step = (Math.max(...xs) - Math.min(...xs)) / (xs.length - 1) || 0.1;
-                slider.value = xInicial;
-                badge.innerText = parseFloat(xInicial).toFixed(2);
-
-                renderTangente(parseFloat(xInicial));
-
-                slider.addEventListener('input', function (e) {
-                    const val = parseFloat(e.target.value);
-                    badge.innerText = val.toFixed(2);
-                    renderTangente(val);
-                });
-            }
-        }
-
-        /* -------------------- PONTOS CRÍTICOS -------------------- */
-        else if (dadosOriginais.tipo === 'pontos_criticos') {
-            option = {
-                ...commonConfig,
-                title: { text: 'Pontos Críticos', left: 'center' },
-                legend: { top: 36 },
-                series: [
-                    {
-                        name: 'f(x)',
-                        type: 'line',
-                        data: xs.map((x, i) => [x, ys[i]]),
-                        smooth: true,
-                        lineStyle: { width: 3, color: '#667eea' },
-                        showSymbol: false,
-                        connectNulls: false
-                    },
-                    ...(Array.isArray(dadosOriginais.pontos)
-                        ? dadosOriginais.pontos.map(p => ({
-                            name: p.tipo,
-                            type: 'scatter',
-                            data: [[p.x, p.y]],
-                            symbolSize: 22,
-                            itemStyle: {
-                                color:
-                                    p.tipo.includes("Máximo") ? '#e74c3c' :        // vermelho forte
-                                        p.tipo.includes("Mínimo") ? '#3498db' :        // azul forte
-                                            '#e67e22',                                     // laranja forte
-                                borderColor: '#000000',
-                                borderWidth: 0,
-                                opacity: 1       // <-- garante que não fica transparente
-                            }
-                        }))
-                        : [])
-                ]
-            };
-
-            myChart.setOption(option);
-        }
-
-        /* -------------------- INTEGRAL -------------------- */
-        else if (dadosOriginais.tipo === 'integral') {
-            document.getElementById('controles-dinamicos').style.display = 'block';
-
-            function calcularRetangulos(n) {
-                const a = dadosOriginais.intervalo[0];
-                const b = dadosOriginais.intervalo[1];
-                const delta = (b - a) / n;
-                const ret = [];
-                let soma_liquida = 0;
-                let soma_absoluta = 0;
-
-                for (let i = 0; i < n; i++) {
-                    const x_esq = a + i * delta;
-                    const idx = xs.findIndex(x => x >= x_esq);
-                    const altura = (idx !== -1 && ys[idx] !== null) ? ys[idx] : 0;
-                    ret.push({ x: x_esq, largura: delta, altura: altura });
-                    soma_liquida += altura * delta;
-                    soma_absoluta += Math.abs(altura * delta);
+            /* -------------------- DERIVADA -------------------- */
+            else if (dadosOriginais.tipo === 'derivada') {
+                // Mostra o controle do slider
+                const xAxisControl = document.getElementById('xAxisControl');
+                if (xAxisControl) {
+                    xAxisControl.classList.remove('hidden');
                 }
 
-                return { retangulos: ret, soma_liquida, soma_absoluta };
+                function avaliarExpressao(exprStr, xVal) {
+                    try {
+                        let jsExpr = exprStr
+                            .replace(/log\(/g, 'Math.log(')
+                            .replace(/exp\(/g, 'Math.exp(')
+                            .replace(/sin\(/g, 'Math.sin(')
+                            .replace(/cos\(/g, 'Math.cos(')
+                            .replace(/tan\(/g, 'Math.tan(')
+                            .replace(/sqrt\(/g, 'Math.sqrt(')
+                            .replace(/x/g, `(${xVal})`);
+                        const result = eval(jsExpr);
+                        return (typeof result === 'number' && isFinite(result)) ? result : null;
+                    } catch (e) {
+                        console.error('Erro ao avaliar expressão:', e);
+                        return null;
+                    }
+                }
+
+                function renderTangente(xTangente) {
+                    const ptTangente = dadosOriginais.ponto_tangente || {};
+                    let y0, m;
+
+                    if (Math.abs(xTangente - (ptTangente.x || 0)) < 0.01) {
+                        y0 = ptTangente.y;
+                        m = ptTangente.inclinacao;
+                    } else {
+                        if (dadosOriginais.expr_str && dadosOriginais.deriv_str) {
+                            y0 = avaliarExpressao(dadosOriginais.expr_str, xTangente);
+                            m = avaliarExpressao(dadosOriginais.deriv_str, xTangente);
+                        } else {
+                            y0 = m = null;
+                        }
+                    }
+
+                    if (y0 === null || m === null || !isFinite(y0) || !isFinite(m)) {
+                        option = {
+                            ...commonConfig,
+                            title: { text: `x = ${xTangente.toFixed(2)} (singularidade)`, left: 'center' },
+                            series: [{
+                                name: 'f(x)',
+                                type: 'line',
+                                data: xs.map((x, i) => [x, ys[i]]),
+                                smooth: true,
+                                lineStyle: { width: 2 },
+                                showSymbol: false,
+                                connectNulls: false
+                            }]
+                        };
+                        window.myChart.setOption(option);
+                        return;
+                    }
+
+                    const extensao = 3;
+                    const rx = [xTangente - extensao, xTangente + extensao];
+                    const ry = rx.map(x => m * (x - xTangente) + y0);
+
+                    option = {
+                        ...commonConfig,
+                        title: { text: `Reta Tangente em x = ${xTangente.toFixed(2)}`, left: 'center' },
+                        legend: { data: ['f(x)', 'Tangente', 'Ponto'], top: 40 },
+                        series: [
+                            {
+                                name: 'f(x)',
+                                type: 'line',
+                                data: xs.map((x, i) => [x, ys[i]]),
+                                smooth: true,
+                                lineStyle: { width: 2 },
+                                showSymbol: false,
+                                connectNulls: false
+                            },
+                            {
+                                name: 'Tangente',
+                                type: 'line',
+                                data: rx.map((x, i) => [rx[i], ry[i]]),
+                                lineStyle: { width: 3, type: 'dashed', color: '#e74c3c' },
+                                showSymbol: false
+                            },
+                            {
+                                name: 'Ponto',
+                                type: 'scatter',
+                                data: [[xTangente, y0]],
+                                symbolSize: 18,
+                                itemStyle: { color: '#f39c12', borderColor: '#e67e22', borderWidth: 2 },
+                                label: {
+                                    show: true,
+                                    formatter: () => `(${xTangente.toFixed(2)}, ${y0.toFixed(2)})\nm = ${m.toFixed(4)}`,
+                                    position: 'top',
+                                    backgroundColor: 'rgba(255,255,255,0.95)',
+                                    padding: [6, 10],
+                                    borderRadius: 6,
+                                    color: '#333'
+                                }
+                            }
+                        ]
+                    };
+                    window.myChart.setOption(option);
+                }
+
+                // Salva a função de renderização para o tema
+                window.currentRenderFunction = function () {
+                    const slider = document.getElementById('xAxisSlider');
+                    if (slider) {
+                        renderTangente(parseFloat(slider.value));
+                    }
+                };
+
+                // Configura o slider
+                const slider = document.getElementById('xAxisSlider');
+                const display = document.getElementById('xValueDisplay');
+
+                if (slider && display) {
+                    const xInicial = (dadosOriginais.ponto_tangente && dadosOriginais.ponto_tangente.x) || 0;
+
+                    slider.min = Math.min(...xs);
+                    slider.max = Math.max(...xs);
+                    slider.step = '0.1';
+                    slider.value = xInicial;
+                    display.textContent = xInicial.toFixed(2);
+
+                    // Renderiza o gráfico inicial
+                    renderTangente(parseFloat(xInicial));
+
+                    // Event listener com addEventListener (mais confiável)
+                    slider.addEventListener('input', function (e) {
+                        const val = parseFloat(e.target.value);
+                        console.log('Slider movido para:', val); // Debug
+                        display.textContent = val.toFixed(2);
+                        renderTangente(val);
+                    });
+
+                    // Fallback: também adiciona onchange
+                    slider.addEventListener('change', function (e) {
+                        const val = parseFloat(e.target.value);
+                        console.log('Slider changed para:', val); // Debug
+                        display.textContent = val.toFixed(2);
+                        renderTangente(val);
+                    });
+
+                    console.log('Slider da derivada configurado:', {
+                        min: slider.min,
+                        max: slider.max,
+                        value: slider.value,
+                        disabled: slider.disabled
+                    });
+                } else {
+                    console.error('Slider ou display não encontrado!');
+                }
             }
 
-            function renderIntegral(n) {
-                const { retangulos, soma_liquida, soma_absoluta } = calcularRetangulos(n);
-
-                document.getElementById('integral_liquida_display').innerText =
-                    (dadosOriginais.integral_liquida ?? 0).toFixed(6);
-                document.getElementById('soma_liquida_display').innerText =
-                    soma_liquida.toFixed(6);
-
-                document.getElementById('area_geometrica_display').innerText =
-                    (dadosOriginais.area_geometrica ?? 0).toFixed(6);
-                document.getElementById('soma_absoluta_display').innerText =
-                    soma_absoluta.toFixed(6);
-
+            /* -------------------- PONTOS CRÍTICOS -------------------- */
+            else if (dadosOriginais.tipo === 'pontos_criticos') {
                 option = {
                     ...commonConfig,
-                    title: { text: `Soma de Riemann (n = ${n})`, left: 'center' },
-                    legend: { data: ['f(x)', 'Retângulos'], top: 36 },
+                    title: { text: 'Pontos Críticos', left: 'center' },
                     series: [
                         {
                             name: 'f(x)',
                             type: 'line',
                             data: xs.map((x, i) => [x, ys[i]]),
                             smooth: true,
-                            lineStyle: { width: 3, color: '#667eea' },
+                            lineStyle: { width: 3 },
                             showSymbol: false,
-                            connectNulls: false,
-                            z: 10
+                            connectNulls: false
                         },
-                        {
-                            name: 'Retângulos',
-                            type: 'custom',
-                            renderItem: function (params, api) {
-                                const idx = params.dataIndex;
-                                const r = retangulos[idx];
-                                if (!r) return null;
-
-                                const xStart = api.coord([r.x, 0])[0];
-                                const xEnd = api.coord([r.x + r.largura, 0])[0];
-                                const yZero = api.coord([0, 0])[1];
-                                const yVal = api.coord([0, r.altura])[1];
-
-                                return {
-                                    type: 'rect',
-                                    shape: {
-                                        x: xStart,
-                                        y: Math.min(yZero, yVal),
-                                        width: xEnd - xStart,
-                                        height: Math.abs(yZero - yVal)
-                                    },
-                                    style: {
-                                        fill: (r.altura >= 0)
-                                            ? 'rgba(52,152,219,0.45)'
-                                            : 'rgba(231,76,60,0.45)',
-                                        stroke: (r.altura >= 0)
-                                            ? 'rgba(52,152,219,0.9)'
-                                            : 'rgba(231,76,60,0.9)',
-                                        lineWidth: 1
-                                    }
-                                };
-                            },
-                            data: retangulos,
-                            z: 5
-                        }
+                        ...(Array.isArray(dadosOriginais.pontos)
+                            ? dadosOriginais.pontos.map(p => ({
+                                name: p.tipo,
+                                type: 'scatter',
+                                data: [[p.x, p.y]],
+                                symbolSize: 22,
+                                itemStyle: {
+                                    color: p.tipo.includes("Máximo") ? '#e74c3c' :
+                                        p.tipo.includes("Mínimo") ? '#3498db' : '#e67e22'
+                                }
+                            }))
+                            : [])
                     ]
                 };
 
-                myChart.setOption(option);
+                window.myChart.setOption(option);
+
+                // Salva função para re-renderizar ao trocar tema
+                window.currentRenderFunction = function () {
+                    window.myChart.setOption(option);
+                };
             }
 
-            const sliderInt = document.getElementById('slider_dinamico');
-            const badgeN = document.getElementById('val_n_dinamico');
+            /* -------------------- INTEGRAL -------------------- */
+            else if (dadosOriginais.tipo === 'integral') {
+                document.getElementById('integralControl').classList.remove('hidden');
 
-            if (sliderInt) {
-                const initN = parseInt(sliderInt.value || 10);
-                badgeN.innerText = initN;
-                renderIntegral(initN);
+                function getYAtX(xVal) {
+                    if (xs.length === 0) return 0;
+                    if (xVal <= xs[0]) return ys[0] || 0;
+                    if (xVal >= xs[xs.length - 1]) return ys[ys.length - 1] || 0;
 
-                sliderInt.addEventListener('input', function (e) {
-                    const n = parseInt(e.target.value, 10) || 1;
-                    badgeN.innerText = n;
+                    for (let i = 0; i < xs.length - 1; i++) {
+                        if (xVal >= xs[i] && xVal <= xs[i + 1]) {
+                            const y1 = ys[i], y2 = ys[i + 1];
+                            if (y1 === null || y2 === null || !isFinite(y1) || !isFinite(y2)) return 0;
+                            const t = (xVal - xs[i]) / (xs[i + 1] - xs[i]);
+                            return y1 + t * (y2 - y1);
+                        }
+                    }
+                    return 0;
+                }
+
+                function calcularRetangulos(n) {
+                    const a = dadosOriginais.intervalo[0];
+                    const b = dadosOriginais.intervalo[1];
+                    const delta = (b - a) / n;
+                    const ret = [];
+                    let soma_liquida = 0, soma_absoluta = 0;
+
+                    for (let i = 0; i < n; i++) {
+                        const x_esq = a + i * delta;
+                        const x_dir = x_esq + delta;
+                        const h_esq = getYAtX(x_esq);
+                        const h_dir = getYAtX(x_dir);
+                        const altura = Math.abs(h_esq) < Math.abs(h_dir) ? h_esq : h_dir;
+
+                        ret.push({ x: x_esq, largura: delta, altura });
+                        soma_liquida += altura * delta;
+                        soma_absoluta += Math.abs(altura * delta);
+                    }
+                    return { retangulos: ret, soma_liquida, soma_absoluta };
+                }
+
+                function renderIntegral(n) {
+                    const { retangulos, soma_liquida, soma_absoluta } = calcularRetangulos(n);
+
+                    document.getElementById('integralLiquida').textContent =
+                        `Real: ${(dadosOriginais.integral_liquida ?? 0).toFixed(4)} | Aprox: ${soma_liquida.toFixed(4)}`;
+                    document.getElementById('areaGeometrica').textContent =
+                        `Real: ${(dadosOriginais.area_geometrica ?? 0).toFixed(4)} | Aprox: ${soma_absoluta.toFixed(4)}`;
+
+                    option = {
+                        ...commonConfig,
+                        title: { text: `Soma de Riemann (n = ${n})`, left: 'center' },
+                        legend: { data: ['f(x)', 'Retângulos'], top: 40 },
+                        series: [
+                            {
+                                name: 'f(x)',
+                                type: 'line',
+                                data: xs.map((x, i) => [x, ys[i]]),
+                                smooth: true,
+                                lineStyle: { width: 3 },
+                                showSymbol: false,
+                                connectNulls: false,
+                                z: 10
+                            },
+                            {
+                                name: 'Retângulos',
+                                type: 'custom',
+                                renderItem: function (params, api) {
+                                    const r = retangulos[params.dataIndex];
+                                    if (!r) return null;
+
+                                    const xStart = api.coord([r.x, 0])[0];
+                                    const xEnd = api.coord([r.x + r.largura, 0])[0];
+                                    const yZero = api.coord([0, 0])[1];
+                                    const yVal = api.coord([0, r.altura])[1];
+
+                                    return {
+                                        type: 'rect',
+                                        shape: {
+                                            x: xStart,
+                                            y: Math.min(yZero, yVal),
+                                            width: xEnd - xStart,
+                                            height: Math.abs(yZero - yVal)
+                                        },
+                                        style: {
+                                            fill: r.altura >= 0 ? 'rgba(52,152,219,0.45)' : 'rgba(231,76,60,0.45)',
+                                            stroke: r.altura >= 0 ? 'rgba(52,152,219,0.9)' : 'rgba(231,76,60,0.9)',
+                                            lineWidth: 1
+                                        }
+                                    };
+                                },
+                                data: retangulos,
+                                z: 5
+                            }
+                        ]
+                    };
+                    window.myChart.setOption(option);
+                }
+
+                // Salva a função de renderização para o tema
+                window.currentRenderFunction = function () {
+                    const slider = document.getElementById('nRetSlider');
+                    if (slider) {
+                        renderIntegral(parseInt(slider.value, 10));
+                    }
+                };
+
+                const sliderInt = document.getElementById('nRetSlider');
+                const displayN = document.getElementById('nRetDisplay');
+
+                renderIntegral(10);
+                sliderInt.oninput = function () {
+                    const n = parseInt(this.value, 10);
+                    displayN.textContent = n;
                     renderIntegral(n);
-                });
+                };
             }
         }
 
-        window.addEventListener('resize', () => myChart.resize());
+        renderChart();
+        window.addEventListener('resize', () => { if (window.myChart) window.myChart.resize(); });
+
+        // Debug: verifica se os elementos existem
+        console.log('Elementos encontrados:', {
+            xAxisControl: !!document.getElementById('xAxisControl'),
+            xAxisSlider: !!document.getElementById('xAxisSlider'),
+            xValueDisplay: !!document.getElementById('xValueDisplay'),
+            integralControl: !!document.getElementById('integralControl'),
+            nRetSlider: !!document.getElementById('nRetSlider')
+        });
         }) ();
+        {% endif %}
     </script>
-    {% endif %}
 
 </body>
 
